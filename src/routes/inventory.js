@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
 const inventoryController = require('../app/controller/InventoryController')
-const { VerifyToken, isAdmin } = require('../app/middlewares/VerifyToken')
+const { VerifyToken, VerifyUserIsAdmin } = require('../app/middlewares/VerifyToken')
 
-router.put('/:id', [ VerifyToken, isAdmin ],inventoryController.increase)
-router.post('/', [ VerifyToken, isAdmin ], inventoryController.create)
-router.get('/:id', [ VerifyToken, isAdmin ], inventoryController.info)
-router.get('/', [ VerifyToken, isAdmin ], inventoryController.list)
+router.put('/:id', [ VerifyToken, VerifyUserIsAdmin ],inventoryController.increase)
+router.post('/', [ VerifyToken, VerifyUserIsAdmin ], inventoryController.create)
+router.get('/:id', [ VerifyToken, VerifyUserIsAdmin ], inventoryController.info)
+router.get('/', [ VerifyToken, VerifyUserIsAdmin ], inventoryController.list)
 
 module.exports = router

@@ -6,49 +6,42 @@ class BlogController {
     async info(req, res, next) {
         //Get blog by slug
         const blog = await Blog.findOne({ slug: req.params.slug })
-        //If blog is not exist return error message 
-        if(!blog)
+        //If blog is not exist return error message
+        if (!blog)
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Blog is not exist'
+                message: 'Blog is not exist',
             })
 
-        try{
+        try {
             //Increase number of views
             blog.numberViews += 1
             //Save blog in db
             await blog.save()
-    
+
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Get blog info success',
-                data: blog
+                data: blog,
             })
-        }catch(error){
+        } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
 
-
     //[GET] /api/blog/
     async list(req, res, next) {
-        try{
+        try {
             //Get blogs
             let blogs = await Blog.find({})
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Get list of blogs success',
-                data: blogs
+                data: blogs,
             })
-
-        }catch(error){
+        } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -59,30 +52,27 @@ class BlogController {
         //Get blog by title
         const blog = await Blog.findOne({ title }).lean()
         //If blog is exist return error message
-        if(blog)
+        if (blog)
             return res.status(400).json({
-                isSuccess: false,
-                message: 'Blog title is exist'
+                message: 'Blog title is exist',
             })
 
-        try{
+        try {
             //Create blog
             const newBlog = await Blog.create({
                 title,
                 content,
                 image,
-                author
+                author,
             })
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Create blog success',
-                data: newBlog
+                data: newBlog,
             })
-        }catch(error){
+        } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -93,38 +83,35 @@ class BlogController {
         //Get blog by id
         const blog = await Blog.findOne({ _id: req.params.id }).lean()
         //If blog is not exist return error message
-        if(!blog)
+        if (!blog)
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Blog is not exist'
+                message: 'Blog is not exist',
             })
-        try{
+        try {
             //Update blog
             await Blog.updateOne(
                 {
-                    _id: req.params.id
+                    _id: req.params.id,
                 },
                 {
                     title,
                     content,
                     image,
-                    author
-                }
+                    author,
+                },
             )
 
             //Find new blog by id
             const newBlog = await Blog.findOne({ _id: req.params.id }).lean()
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Update blog success',
                 data: blog,
-                newData: newBlog
+                newData: newBlog,
             })
-        }catch(error){
+        } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -134,24 +121,21 @@ class BlogController {
         //Get blog by id
         const blog = await Blog.findOne({ _id: req.params.id }).lean()
         //If blog is not exist return error message
-        if(!blog)
+        if (!blog)
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Blog is not exist'
+                message: 'Blog is not exist',
             })
-        
-        try{
+
+        try {
             //Delete blog by id
             await Blog.deleteOne({ _id: req.params.id })
 
             return res.status(200).json({
-                isSuccess: true,
-                message: 'Delete blog success'
+                message: 'Delete blog success',
             })
-        }catch(error){
+        } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -162,13 +146,12 @@ class BlogController {
         const user = await User.findOne({ _id: req.user._id })
         //Get blog by user id in liked
         const blog = await Blog.findOne({ liked: user._id })
-        if(blog) {
+        if (blog) {
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Blog already is like'
+                message: 'Blog already is like',
             })
         }
-        try{
+        try {
             //Update blog by id
             await Blog.updateOne(
                 {
@@ -176,22 +159,20 @@ class BlogController {
                 },
                 {
                     $push: { liked: user._id }, //Push user id in liked in blog
-                    $inc: { isLiked: 1 } //Count number of liked
-                }
+                    $inc: { isLiked: 1 }, //Count number of liked
+                },
             )
 
             //Get new blog
             const newBlog = await Blog.findOne({ _id: req.params.id })
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Like blog success',
-                data: newBlog
+                data: newBlog,
             })
-        }catch(error){
+        } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -202,13 +183,12 @@ class BlogController {
         const user = await User.findOne({ _id: req.user._id })
         //Get blog by user id in liked
         const blog = await Blog.findOne({ liked: user._id })
-        if(!blog) {
+        if (!blog) {
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Blog already is unlike'
+                message: 'Blog already is unlike',
             })
         }
-        try{
+        try {
             //Update blog by id
             await Blog.updateOne(
                 {
@@ -216,22 +196,20 @@ class BlogController {
                 },
                 {
                     $pull: { liked: user._id }, //Push user id in liked in blog
-                    $inc: { isLiked: -1 } //Count number of liked
-                }
+                    $inc: { isLiked: -1 }, //Count number of liked
+                },
             )
 
             //Get new blog
             const newBlog = await Blog.findOne({ _id: req.params.id })
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Unlike blog success',
-                data: newBlog
+                data: newBlog,
             })
-        }catch(error){
+        } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }

@@ -8,6 +8,7 @@ const connectDB = require('./config/db/connectDB')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 require('dotenv').config()
+const multer = require('multer')
 
 const route = require('./routes/route')
 

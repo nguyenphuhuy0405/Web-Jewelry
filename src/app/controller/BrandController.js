@@ -11,19 +11,17 @@ class BrandController {
                 brands = await Brand.find({})
                     .lean()
                     .sort({
-                        [req.query.field]: req.query.type
+                        [req.query.field]: req.query.type,
                     }) //sort by field: asc or desc
             }
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Get list of brands success',
-                data: brands
+                data: brands,
             })
         } catch (err) {
             return res.status(400).json({
-                isSuccess: false,
-                message: err
+                message: err,
             })
         }
     }
@@ -32,14 +30,13 @@ class BrandController {
     async create(req, res, next) {
         //Get brand by brandCode
         const isExistBrand = await Brand.findOne({
-            brandCode: req.body.brandCode
+            brandCode: req.body.brandCode,
         }).lean()
 
         //If brand is exist return error message
         if (isExistBrand) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'Brand Code is exist'
+                message: 'Brand Code is exist',
             })
         }
 
@@ -48,20 +45,18 @@ class BrandController {
             const brand = new Brand({
                 brandCode: req.body.brandCode,
                 brandName: req.body.brandName,
-                description: req.body.description
+                description: req.body.description,
             })
             //Save brand in db
             let newBrand = await brand.save()
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Create brand success',
-                data: newBrand
+                data: newBrand,
             })
         } catch (err) {
             return res.status(400).json({
-                isSuccess: false,
-                message: err
+                message: err,
             })
         }
     }
@@ -75,36 +70,33 @@ class BrandController {
             //If brand is not exist return error message
             if (!brand) {
                 return res.status(404).json({
-                    isSuccess: false,
-                    message: 'Brand is not exist'
+                    message: 'Brand is not exist',
                 })
             }
 
             //Update brand
             await Brand.updateOne(
                 {
-                    _id: req.params.id
+                    _id: req.params.id,
                 },
                 {
                     brandCode: req.body.brandCode,
                     brandName: req.body.brandName,
-                    description: req.body.description
-                }
+                    description: req.body.description,
+                },
             )
 
             //Find new brand
             const newBrand = await Brand.findOne({ _id: req.params.id }).lean()
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Update brand success',
                 oldData: brand,
-                data: newBrand
+                data: newBrand,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -117,8 +109,7 @@ class BrandController {
         //If brand is not exist return error message
         if (!brand) {
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Brand is not exist'
+                message: 'Brand is not exist',
             })
         }
 
@@ -127,13 +118,11 @@ class BrandController {
             await Brand.deleteOne({ _id: req.params.id })
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Delete brand success',
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }

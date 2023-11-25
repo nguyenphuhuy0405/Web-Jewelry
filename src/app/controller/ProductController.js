@@ -1,31 +1,30 @@
+const fs = require('fs')
+
 const Product = require('../models/Product')
 const User = require('../models/User')
 const Comment = require('../models/Comment')
+const convertImage = require('../middlewares/convertImage')
+
 class ProductController {
     // [GET] /api/product/:slug
     async info(req, res, next) {
         //Get product by slug
-        const product = await Product.findOne({ slug: req.params.slug })
-            .populate('comments')
-            .lean()
+        const product = await Product.findOne({ slug: req.params.slug }).populate('comments').lean()
         // console.log(product)
         //If product is not exist return error message
         if (!product)
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Product is not exist'
+                message: 'Product is not exist',
             })
 
         try {
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Get product info success',
-                data: product
+                data: product,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -34,47 +33,46 @@ class ProductController {
     async list(req, res, next) {
         try {
             //Get products
-            let products = await Product.find({})
-                .lean()
+            let products = await Product.find({}).lean()
 
             //If query has _sort
             if (req.query.hasOwnProperty('_sort')) {
                 products = await Product.find({})
                     .lean()
                     .sort({
-                        [req.query.field]: req.query.type
+                        [req.query.field]: req.query.type,
                     }) //sort by field: asc or desc
             }
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Get list of products success',
-                data: products
+                data: products,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
 
     // [POST] /api/product/
     async create(req, res, next) {
-        const { title, description, images, price, categoryId, brandId } = req.body
+        const { title, description, price, categoryId, brandId } = req.body
         // Get product by title
         const isExistProduct = await Product.findOne({
-            title: req.body.title
+            title: req.body.title,
         }).lean()
 
         //If product is exist return error message
         if (isExistProduct)
-        return res.status(400).json({
-            isSuccess: false,
-            message: 'Product is exist'
-        })
+            return res.status(400).json({
+                message: 'Product is exist',
+            })
 
         try {
+            //Convert images to base64
+            const images = convertImage(req.file)
+
             //Create product
             const product = await Product.create({
                 title,
@@ -82,18 +80,16 @@ class ProductController {
                 images,
                 price,
                 categoryId,
-                brandId
+                brandId,
             })
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Create product success',
-                data: product
+                data: product,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -107,15 +103,14 @@ class ProductController {
         //If product is not exist return error message
         if (!product)
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Product is not exist'
+                message: 'Product is not exist',
             })
 
         try {
             // Update product by id
             await Product.updateOne(
                 {
-                    _id: req.params.id
+                    _id: req.params.id,
                 },
                 {
                     title,
@@ -123,40 +118,36 @@ class ProductController {
                     images,
                     price,
                     categoryId,
-                    brandId
-                }
+                    brandId,
+                },
             )
 
             // Find new product by id
             const newProduct = await Product.findOne({
-                _id: req.params.id
+                _id: req.params.id,
             }).lean()
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Update product success',
                 oldData: product,
-                data: newProduct
+                data: newProduct,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
 
     // [DELETE] /api/product/:id
     async delete(req, res, next) {
-        
         // Get product by id
         const product = await Product.findOne({ _id: req.params.id }).lean()
 
         //If product is not exist return error message
         if (!product)
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Product is not exist'
+                message: 'Product is not exist',
             })
 
         try {
@@ -164,13 +155,11 @@ class ProductController {
             await Product.deleteOne({ _id: req.params.id })
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Delete product success',
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -186,31 +175,29 @@ class ProductController {
             const comment = await Comment.create({
                 star,
                 content,
-                user: user._id
+                user: user._id,
             })
 
             // Push comment id in product
             await Product.updateOne(
                 { _id: req.params.id },
                 {
-                    $push: { comments: comment._id }
-                }
+                    $push: { comments: comment._id },
+                },
             )
 
             // Get new product by id
             const product = await Product.findOne({
-                _id: req.params.id
+                _id: req.params.id,
             }).lean()
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Comment product success',
-                data: product
+                data: product,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -220,14 +207,13 @@ class ProductController {
         const { star, content } = req.body
         //Get comment by idComment
         const comment = await Comment.findOne({
-            _id: req.params.idComment
+            _id: req.params.idComment,
         })
 
         //If comment is not exist return error message
         if (!comment)
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Comment is not exist'
+                message: 'Comment is not exist',
             })
 
         try {
@@ -236,25 +222,23 @@ class ProductController {
                 { _id: req.params.idComment },
                 {
                     star,
-                    content
-                }
+                    content,
+                },
             )
 
             //Get new comment by idComment
             const newComment = await Comment.findOne({
-                _id: req.params.idComment
+                _id: req.params.idComment,
             }).lean()
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Update comment success',
                 oldData: comment,
-                data: newComment
+                data: newComment,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -267,8 +251,7 @@ class ProductController {
         //If comment is not exist return error message
         if (!comment)
             return res.status(404).json({
-                isSuccess: false,
-                message: 'Comment is not exist'
+                message: 'Comment is not exist',
             })
 
         try {
@@ -276,20 +259,34 @@ class ProductController {
             await Comment.deleteOne({ _id: req.params.idComment }).lean()
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Delete comment success',
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
 
     //[PUT] /api/product/updateImage/:id
-    async updateImage(req, res, next) {
-        
+    async updateImage(req, res, next) {}
+
+    //[GET] /api/product/search
+    async search(req, res, next) {
+        try {
+            const q = req.query.q
+
+            //Find product contain search string
+            const products = await Product.find({ slug: { $regex: `${q}` } })
+            return res.status(200).json({
+                message: 'Find products success',
+                data: products,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
     }
 }
 

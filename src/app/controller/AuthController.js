@@ -4,10 +4,7 @@ const bcrypt = require('bcryptjs')
 const sendEmail = require('../../utils/sendEmail')
 const crypto = require('crypto')
 const { registerValidator } = require('../../validation/auth')
-const {
-    generateAccessToken,
-    generateRefreshToken
-} = require('../middlewares/GenerateToken')
+const { generateAccessToken, generateRefreshToken } = require('../middlewares/GenerateToken')
 require('dotenv').config()
 
 class AuthController {
@@ -18,8 +15,7 @@ class AuthController {
         const { name, email, password, address, phoneNumber } = req.body
         if (error)
             return res.status(400).json({
-                isSuccess: false,
-                message: error.details[0].message
+                message: error.details[0].message,
             })
 
         //Get email
@@ -27,8 +23,7 @@ class AuthController {
         //If email is exist return error message
         if (isExistEmail)
             return res.status(400).json({
-                isSuccess: false,
-                message: 'Email is already exist'
+                message: 'Email is already exist',
             })
 
         //Get phone number
@@ -36,8 +31,7 @@ class AuthController {
         //If phone number is exist return error message
         if (isExistPhoneNumber) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'PhoneNumber is already exist'
+                message: 'PhoneNumber is already exist',
             })
         }
 
@@ -48,18 +42,16 @@ class AuthController {
                 email,
                 password,
                 address,
-                phoneNumber
+                phoneNumber,
             })
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Register success',
-                data: user
+                data: user,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -73,8 +65,8 @@ class AuthController {
         if (!user)
             return res.status(400).json({
                 isLogin: false,
-                isSuccess: false,
-                message: 'User is not exist'
+
+                message: 'User is not exist',
             })
 
         //Compare password
@@ -83,8 +75,8 @@ class AuthController {
         if (!isCorrectPassword)
             return res.status(400).json({
                 isLogin: false,
-                isSuccess: false,
-                message: 'Password is not correct'
+
+                message: 'Password is not correct',
             })
 
         try {
@@ -94,18 +86,18 @@ class AuthController {
 
             //Save refresh token in database
             await User.updateOne(
-                { 
-                    _id: user._id 
+                {
+                    _id: user._id,
                 },
-                { 
-                    refreshToken: refreshToken 
-                }
+                {
+                    refreshToken: refreshToken,
+                },
             )
 
             //Save refresh token in cookies
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                maxAge: 30 * 24 * 60 * 60 * 100 // 30 days
+                maxAge: 30 * 24 * 60 * 60 * 100, // 30 days
             })
 
             console.log('accessToken:', accessToken)
@@ -116,14 +108,13 @@ class AuthController {
             return res.json({
                 accessToken: accessToken,
                 isLogin: true,
-                isSuccess: true,
+
                 message: `${newUser.name} is login`,
-                data: newUser
+                data: newUser,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -137,8 +128,7 @@ class AuthController {
             //If refresh token in cookies or cookies is not exist return error message
             if (!req.cookies.refreshToken && !req.cookies)
                 return res.status(401).json({
-                    isSuccess: false,
-                    message: 'Refresh token not found'
+                    message: 'Refresh token not found',
                 })
 
             // Verify refresh token
@@ -148,27 +138,24 @@ class AuthController {
             // Find user by id and refresh token
             const user = await User.findOne({
                 _id: result._id,
-                refreshToken: refreshToken
+                refreshToken: refreshToken,
             }).lean()
             console.log('user: ', user)
 
             //If user is not exist return error message
             if (!user)
                 return res.status(401).json({
-                    isSuccess: false,
-                    message: 'User not found'
+                    message: 'User not found',
                 })
 
             return res.status(200).json({
-                isSuccess: true,
                 message: 'Refresh access token success',
                 accessToken: generateAccessToken(user._id, user.role),
-                data: user
+                data: user,
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -182,8 +169,7 @@ class AuthController {
             // Check refresh token
             if (!req.cookies.refreshToken && !req.cookies)
                 return res.status(401).json({
-                    isSuccess: false,
-                    message: 'Refresh token not found'
+                    message: 'Refresh token not found',
                 })
 
             //Set refreshToken in res
@@ -194,13 +180,12 @@ class AuthController {
 
             return res.status(200).json({
                 isLogin: false,
-                isSuccess: true,
-                message: 'Logout success'
+
+                message: 'Logout success',
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -214,8 +199,7 @@ class AuthController {
             //If user is not exist return error message
             if (!user) {
                 return res.status(404).json({
-                    isSuccess: false,
-                    message: 'User not found'
+                    message: 'User not found',
                 })
             }
 
@@ -232,13 +216,11 @@ class AuthController {
             await sendEmail(user.email, 'Password reset', text)
 
             return res.status(404).json({
-                isSuccess: true,
-                message: 'Password reset link sent to your email account'
+                message: 'Password reset link sent to your email account',
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
@@ -247,21 +229,17 @@ class AuthController {
     async passwordReset(req, res, next) {
         const { password } = req.body
         //Create password reset token
-        const passwordResetToken = crypto
-            .createHash('sha256')
-            .update(req.params.token)
-            .digest('hex')
+        const passwordResetToken = crypto.createHash('sha256').update(req.params.token).digest('hex')
 
-        //Find user by passwordResetToken and passwordResetExpires > now 
+        //Find user by passwordResetToken and passwordResetExpires > now
         const user = await User.findOne({
             passwordResetToken: passwordResetToken,
-            passwordResetExpires: { $gt: Date.now() }
+            passwordResetExpires: { $gt: Date.now() },
         })
         //If user is not exist return error message
         if (!user) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'Invalid link or expired'
+                message: 'Invalid link or expired',
             })
         }
 
@@ -273,15 +251,13 @@ class AuthController {
             user.passwordResetExpires = undefined
             //Save user in db
             await user.save()
-    
+
             return res.status(404).json({
-                isSuccess: true,
-                message: 'Password reset successfully'
+                message: 'Password reset successfully',
             })
         } catch (error) {
             return res.status(400).json({
-                isSuccess: false,
-                message: 'An error occured! ' + error
+                message: 'An error occured! ' + error,
             })
         }
     }
