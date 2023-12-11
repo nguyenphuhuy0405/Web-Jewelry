@@ -1,7 +1,7 @@
 const Brand = require('../models/Brand')
 class BrandController {
     //[GET] /api/brand/
-    async list(req, res, next) {
+    async list(req, res) {
         try {
             //Get brands
             let brands = await Brand.find({}).lean()
@@ -27,7 +27,7 @@ class BrandController {
     }
 
     //[POST] /api/brand/
-    async create(req, res, next) {
+    async create(req, res) {
         //Get brand by brandCode
         const isExistBrand = await Brand.findOne({
             brandCode: req.body.brandCode,
@@ -62,7 +62,7 @@ class BrandController {
     }
 
     //[PUT] /api/brand/:id
-    async update(req, res, next) {
+    async update(req, res) {
         try {
             //Get brand by id
             const brand = await Brand.findOne({ _id: req.params.id }).lean()
@@ -102,7 +102,7 @@ class BrandController {
     }
 
     //[DELETE] /api/brand/:id
-    async delete(req, res, next) {
+    async delete(req, res) {
         //Get brand by id
         const brand = await Brand.findOne({ _id: req.params.id }).lean()
 

@@ -3,7 +3,7 @@ const User = require('../models/User')
 
 class BlogController {
     //[GET] /api/blog/:slug
-    async info(req, res, next) {
+    async info(req, res) {
         //Get blog by slug
         const blog = await Blog.findOne({ slug: req.params.slug })
         //If blog is not exist return error message
@@ -30,7 +30,7 @@ class BlogController {
     }
 
     //[GET] /api/blog/
-    async list(req, res, next) {
+    async list(req, res) {
         try {
             //Get blogs
             let blogs = await Blog.find({})
@@ -47,7 +47,7 @@ class BlogController {
     }
 
     //[POST] /api/blog/
-    async create(req, res, next) {
+    async create(req, res) {
         const { title, content, image, author } = req.body
         //Get blog by title
         const blog = await Blog.findOne({ title }).lean()
@@ -78,7 +78,7 @@ class BlogController {
     }
 
     //[PUT] /api/blog/:id
-    async update(req, res, next) {
+    async update(req, res) {
         const { title, content, image, author } = req.body
         //Get blog by id
         const blog = await Blog.findOne({ _id: req.params.id }).lean()
@@ -117,7 +117,7 @@ class BlogController {
     }
 
     //[DELETE] /api/blog/:id
-    async delete(req, res, next) {
+    async delete(req, res) {
         //Get blog by id
         const blog = await Blog.findOne({ _id: req.params.id }).lean()
         //If blog is not exist return error message
@@ -141,7 +141,7 @@ class BlogController {
     }
 
     //[POST] /api/blog/like/:id
-    async like(req, res, next) {
+    async like(req, res) {
         //Get user by id
         const user = await User.findOne({ _id: req.user._id })
         //Get blog by user id in liked
@@ -178,7 +178,7 @@ class BlogController {
     }
 
     //[POST] /api/blog/unlike/:id
-    async unlike(req, res, next) {
+    async unlike(req, res) {
         //Get user by id
         const user = await User.findOne({ _id: req.user._id })
         //Get blog by user id in liked

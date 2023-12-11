@@ -3,11 +3,11 @@ const Cart = require('../models/Cart')
 
 class CartController {
     //[GET] /api/cart/
-    async getCart(req, res, next) {
+    async getCart(req, res) {
         const userId = req.user._id
         try {
             //Get cart by user id
-            const cart = await Cart.findOne({ userId }).lean()
+            const cart = await Cart.findOne({ userId }).lean().populate('products.productId')
             //If cart not exist return error message
             if (!cart)
                 return res.status(404).json({
@@ -26,44 +26,51 @@ class CartController {
     }
 
     //[POST] /api/cart/
-    async addToCart(req, res, next) {
+    async addToCart(req, res) {
         const userId = req.user._id
-        const { productId, quantity } = req.body
+        const productId = Number.parseInt(req.params.productId)
         try {
             //Get cart by productId
             const cart = await Cart.findOne({
                 userId,
-                products: {
-                    $elemMatch: {
-                        productId,
-                    },
-                },
             })
-            //If productId already exist in cart return error message
-            if (cart)
-                return res.status(400).json({
-                    message: 'Product already exist in your cart',
-                })
 
-            //Find cart by userId and push product (if not exist create new cart)
-            await Cart.findOneAndUpdate(
-                {
-                    userId,
-                },
-                {
-                    $push: {
-                        products: {
-                            productId,
-                            quantity,
+            //Get product in cart
+            const product = cart.products.find((product) => {
+                if (product.productId === productId) {
+                    return product
+                } else {
+                    return null
+                }
+            })
+
+            //If product already exist in cart increase quantity
+            if (product) {
+                //Increase quantity
+                product.quantity += 1
+
+                //Save cart
+                await cart.save()
+            } else {
+                //Find cart by userId and push product (if not exist create new cart)
+                await Cart.findOneAndUpdate(
+                    {
+                        userId,
+                    },
+                    {
+                        $push: {
+                            products: {
+                                productId,
+                                quantity: 1,
+                            },
                         },
                     },
-                },
-                {
-                    upsert: true, //create if not exist
-                    new: false, //return new document
-                },
-            )
-
+                    {
+                        upsert: true, //create if not exist
+                        new: false, //return new document
+                    },
+                )
+            }
             //Get new cart
             const newCart = await Cart.findOne({ userId })
 
@@ -79,7 +86,7 @@ class CartController {
     }
 
     //[PUT] /api/cart/
-    async updateCart(req, res, next) {
+    async updateCart(req, res) {
         const userId = req.user._id
         const { productId, quantity } = req.body
 
@@ -107,10 +114,10 @@ class CartController {
         }
     }
 
-    //[DELETE] /api/cart/
-    async deleteCart(req, res, next) {
+    //[DELETE] /api/cart/:productId
+    async removeToCart(req, res) {
         const userId = req.user._id
-        const { productId, quantity } = req.body
+        const productId = req.params.productId
         try {
             //Find cart by userId and push product (if not exist create new cart)
             await Cart.findOneAndUpdate(
@@ -136,6 +143,82 @@ class CartController {
             return res.status(200).json({
                 message: 'Delete product in cart success',
                 data: newCart,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
+    //[DELETE] /api/cart/
+    async clearCart(req, res) {
+        const userId = req.user._id
+        try {
+            //Get cart by productId
+            const cart = await Cart.findOne({ userId })
+            //Clear cart
+            cart.products = []
+            //Save cart
+            await cart.save()
+
+            return res.status(200).json({
+                message: 'Clear cart success',
+                data: cart,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
+    //[GET] /api/cart/get-total-price
+    async getTotalPrice(req, res) {
+        const userId = req.user._id
+        try {
+            //Get cart by productId
+            const cart = await Cart.findOne({ userId }).populate('products.productId')
+
+            //Calculate total price
+            cart.products.forEach((product) => {
+                cart.totalPrice += product.quantity * product.productId.price
+            })
+
+            await cart.save()
+
+            return res.status(200).json({
+                message: 'Calculate total price success',
+                data: {
+                    totalPrice: cart.totalPrice,
+                },
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
+    //[GET] /api/cart/get-total-quantity
+    async getTotalQuantity(req, res) {
+        const userId = req.user._id
+        try {
+            //Get cart by productId
+            const cart = await Cart.findOne({ userId })
+
+            //Calculate total quantity
+            cart.products.forEach((product) => {
+                cart.totalQuantity += product.quantity
+            })
+
+            await cart.save()
+
+            return res.status(200).json({
+                message: 'Calculate total quantity success',
+                data: {
+                    totalQuantity: cart.totalQuantity,
+                },
             })
         } catch (error) {
             return res.status(400).json({

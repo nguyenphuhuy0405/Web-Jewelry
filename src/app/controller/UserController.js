@@ -1,7 +1,7 @@
 const User = require('../models/User')
 class UserController {
     // [GET] /api/user/info
-    async info(req, res, next) {
+    async info(req, res) {
         try {
             //Get user by id
             const user = await User.findOne({ _id: req.user._id }).lean()
@@ -23,7 +23,7 @@ class UserController {
     }
 
     // [GET] /api/user/list
-    async list(req, res, next) {
+    async list(req, res) {
         try {
             //Get users
             const users = await User.find({}).lean()
@@ -40,7 +40,7 @@ class UserController {
     }
 
     // [PUT] /api/user/update
-    async update(req, res, next) {
+    async update(req, res) {
         const { name, address } = req.body
         try {
             //Update user by id
@@ -73,7 +73,7 @@ class UserController {
     }
 
     // [PUT] /api/user/change-password
-    async changePassword(req, res, next) {
+    async changePassword(req, res) {
         try {
             const { password, newPassword } = req.body
             //Get user by id
@@ -104,7 +104,7 @@ class UserController {
     }
 
     // [DELETE] /api/user/:id
-    async delete(req, res, next) {
+    async delete(req, res) {
         //Get user by id
         const user = await User.findOne({ _id: req.params.id }).lean()
 

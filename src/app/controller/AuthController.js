@@ -9,7 +9,7 @@ require('dotenv').config()
 
 class AuthController {
     //[POST] /api/auth/register
-    async register(req, res, next) {
+    async register(req, res) {
         //Check validator
         const { error } = registerValidator(req.body)
         const { name, email, password, address, phoneNumber } = req.body
@@ -57,7 +57,7 @@ class AuthController {
     }
 
     // [POST] /api/auth/login
-    async login(req, res, next) {
+    async login(req, res) {
         const { email, password } = req.body
         //Get user by email
         const user = await User.findOne({ email })
@@ -120,7 +120,7 @@ class AuthController {
     }
 
     // [POST] /api/auth/token
-    async token(req, res, next) {
+    async token(req, res) {
         try {
             // Get refresh token from cookies
             const refreshToken = req.cookies.refreshToken
@@ -161,7 +161,7 @@ class AuthController {
     }
 
     // [POST] /api/auth/logout
-    async logout(req, res, next) {
+    async logout(req, res) {
         try {
             // Get refresh token from cookies
             const { refreshToken } = req.cookies
@@ -191,7 +191,7 @@ class AuthController {
     }
 
     //[POST] /api/auth/password-reset
-    async passwordResetLink(req, res, next) {
+    async passwordResetLink(req, res) {
         try {
             const { email } = req.body
             //Get user by email
@@ -226,7 +226,7 @@ class AuthController {
     }
 
     //[POST] /api/auth/password-reset/:token
-    async passwordReset(req, res, next) {
+    async passwordReset(req, res) {
         const { password } = req.body
         //Create password reset token
         const passwordResetToken = crypto.createHash('sha256').update(req.params.token).digest('hex')

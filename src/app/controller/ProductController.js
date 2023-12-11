@@ -68,10 +68,14 @@ class ProductController {
             return res.status(400).json({
                 message: 'Product is exist',
             })
+        if (!req.file) {
+            return res.status(400).json({
+                message: 'Select upload file',
+            })
+        }
 
         try {
-            //Convert images to base64
-            const images = convertImage(req.file)
+            const images = req.file.path
 
             //Create product
             const product = await Product.create({

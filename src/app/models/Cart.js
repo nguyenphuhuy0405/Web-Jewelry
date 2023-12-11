@@ -9,31 +9,40 @@ const CartSchema = new Schema(
         // },
         userId: {
             type: Number,
-            ref: 'User'
+            ref: 'User',
         },
         active: {
             type: Boolean,
-            default: true
+            default: true,
         },
         modifiedOn: {
             type: Date,
-            default: Date.now
+            default: Date.now,
         },
         products: {
-            type: [{
-                productId: {
-                    type: Number,
-                    ref: 'Product'
+            type: [
+                {
+                    productId: {
+                        type: Number,
+                        ref: 'Product',
+                    },
+                    quantity: Number,
                 },
-                quantity: Number
-            }]
-            
-        }
+            ],
+        },
+        totalQuantity: {
+            type: Number,
+            default: 0,
+        },
+        totalPrice: {
+            type: Number,
+            default: 0,
+        },
     },
     {
         timestamps: true,
         // _id: false
-    }
+    },
 )
 
 //Add plugin

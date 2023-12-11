@@ -2,7 +2,7 @@ const Inventory = require('../models/Inventory')
 
 class InventoryController {
     //[GET] /api/inventory/:id
-    async info(req, res, next) {
+    async info(req, res) {
         const id = req.params.id
         try {
             //Get inventory by id
@@ -20,7 +20,7 @@ class InventoryController {
     }
 
     //[GET] /api/inventory/
-    async list(req, res, next) {
+    async list(req, res) {
         try {
             //Get inventory by id
             const inventories = await Inventory.findOne({})
@@ -37,7 +37,7 @@ class InventoryController {
     }
 
     //[POST] /api/inventory/
-    async create(req, res, next) {
+    async create(req, res) {
         const { productId, quantity } = req.body
 
         const inventory = await Inventory.findOne({ productId: productId })
@@ -65,7 +65,7 @@ class InventoryController {
     }
 
     //[PUT] /api/inventory/:id
-    async increase(req, res, next) {
+    async increase(req, res) {
         const id = req.params.id
         const { quantity } = req.body
         try {

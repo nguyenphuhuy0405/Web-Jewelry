@@ -1,7 +1,7 @@
 const Category = require('../models/Category')
 class CategoryController {
     //[GET] /api/category/
-    async list(req, res, next) {
+    async list(req, res) {
         try {
             //Get categories
             let categories = await Category.find({}).lean()
@@ -18,7 +18,7 @@ class CategoryController {
     }
 
     // [POST] /api/category/
-    async create(req, res, next) {
+    async create(req, res) {
         const { title } = req.body
         //Get category by title
         const isExistCategory = await Category.findOne({
@@ -49,7 +49,7 @@ class CategoryController {
     }
 
     //[PUT] /api/category/:id
-    async update(req, res, next) {
+    async update(req, res) {
         const { title } = req.body
         //Get category by id
         const category = await Category.findOne({ _id: req.params.id }).lean()
@@ -89,7 +89,7 @@ class CategoryController {
     }
 
     //[DELETE] /api/category/:id
-    async delete(req, res, next) {
+    async delete(req, res) {
         //Get category by id
         const category = await Category.findOne({ _id: req.params.id }).lean()
 
