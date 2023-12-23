@@ -96,7 +96,8 @@ class AuthController {
 
             //Save refresh token in cookies
             res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
+                httpOnly: false,
+                secure: false,
                 maxAge: 30 * 24 * 60 * 60 * 100, // 30 days
             })
 
@@ -120,7 +121,7 @@ class AuthController {
     }
 
     // [POST] /api/auth/token
-    async token(req, res) {
+    async refreshToken(req, res) {
         try {
             // Get refresh token from cookies
             const refreshToken = req.cookies.refreshToken
@@ -133,7 +134,8 @@ class AuthController {
 
             // Verify refresh token
             const result = jwt.verify(refreshToken, process.env.TOKEN_SECRET)
-            console.log('result: ', result)
+
+            console.log('result: ', result.exp)
 
             // Find user by id and refresh token
             const user = await User.findOne({
@@ -151,7 +153,6 @@ class AuthController {
             return res.status(200).json({
                 message: 'Refresh access token success',
                 accessToken: generateAccessToken(user._id, user.role),
-                data: user,
             })
         } catch (error) {
             return res.status(400).json({
@@ -164,7 +165,7 @@ class AuthController {
     async logout(req, res) {
         try {
             // Get refresh token from cookies
-            const { refreshToken } = req.cookies
+            //const { refreshToken } = req.cookies
 
             // Check refresh token
             if (!req.cookies.refreshToken && !req.cookies)
@@ -173,14 +174,14 @@ class AuthController {
                 })
 
             //Set refreshToken in res
-            res.cookie('refreshToken', refreshToken)
+            //res.cookie('refreshToken', refreshToken)
 
             // Destroy refresh token
+            localStorage.removeItem('accessToken')
             res.clearCookie('refreshToken')
 
             return res.status(200).json({
                 isLogin: false,
-
                 message: 'Logout success',
             })
         } catch (error) {

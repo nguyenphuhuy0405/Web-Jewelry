@@ -8,16 +8,16 @@ function VerifyToken(req, res, next) {
                 message: 'Required Access Token',
             })
         } else {
-            //Get token
+            //Get access token
             const accessToken = req.headers['authorization'].split(' ')[1]
 
-            jwt.verify(accessToken, process.env.TOKEN_SECRET, (err, decode) => {
+            jwt.verify(accessToken, process.env.TOKEN_SECRET, (err, decoded) => {
                 if (err)
-                    return res.status(401).json({
+                    return res.status(403).json({
                         message: 'Invalid Access Token',
                     })
-                console.log('decoded: ', decode)
-                req.user = decode
+                console.log('decoded: ', decoded)
+                req.user = decoded
                 next()
             })
         }
