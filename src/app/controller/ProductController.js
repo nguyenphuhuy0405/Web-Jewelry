@@ -32,17 +32,32 @@ class ProductController {
     // [GET] /api/product/
     async list(req, res, next) {
         try {
-            //Get products
-            let products = await Product.find({}).lean()
+            let q = req.query.q
+            let sortBy = {}
+            let page = req.query.page
+            let pageSize = req.query.pageSize || 8
+            let start = 0
+            let limit = 0
 
-            //If query has _sort
-            if (req.query.hasOwnProperty('_sort')) {
-                products = await Product.find({})
-                    .lean()
-                    .sort({
-                        [req.query.field]: req.query.type,
-                    }) //sort by field: asc or desc
+            //Search(?q)
+            if (req.query.hasOwnProperty('q')) {
+                q = { slug: { $regex: `${q.toLowerCase()}` } }
             }
+
+            //Sort(?_sort)
+            if (req.query.hasOwnProperty('_sort')) {
+                sortBy = { [req.query.field]: req.query.type }
+            }
+
+            //Pagination(?page)
+            if (req.query.hasOwnProperty('page')) {
+                page = parseInt(page)
+                pageSize = parseInt(pageSize)
+                start = (page - 1) * pageSize
+                limit = pageSize
+            }
+
+            let products = await Product.find(q).sort(sortBy).skip(start).limit(limit).lean()
 
             return res.status(200).json({
                 message: 'Get list of products success',
@@ -75,7 +90,9 @@ class ProductController {
         }
 
         try {
-            const images = req.file.path
+            let images = req.file.path
+            images = images.split('src\\public')[1]
+            console.log('images', images)
 
             //Create product
             const product = await Product.create({
@@ -264,27 +281,6 @@ class ProductController {
 
             return res.status(200).json({
                 message: 'Delete comment success',
-            })
-        } catch (error) {
-            return res.status(400).json({
-                message: 'An error occured! ' + error,
-            })
-        }
-    }
-
-    //[PUT] /api/product/updateImage/:id
-    async updateImage(req, res, next) {}
-
-    //[GET] /api/product/search
-    async search(req, res, next) {
-        try {
-            const q = req.query.q
-
-            //Find product contain search string
-            const products = await Product.find({ slug: { $regex: `${q}` } })
-            return res.status(200).json({
-                message: 'Find products success',
-                data: products,
             })
         } catch (error) {
             return res.status(400).json({

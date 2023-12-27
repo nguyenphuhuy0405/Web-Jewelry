@@ -19,9 +19,9 @@ class BrandController {
                 message: 'Get list of brands success',
                 data: brands,
             })
-        } catch (err) {
+        } catch (error) {
             return res.status(400).json({
-                message: err,
+                message: error,
             })
         }
     }

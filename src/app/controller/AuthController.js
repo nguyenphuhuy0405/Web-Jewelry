@@ -124,10 +124,10 @@ class AuthController {
     async refreshToken(req, res) {
         try {
             // Get refresh token from cookies
-            const refreshToken = req.cookies.refreshToken
+            const refreshToken = req.cookies?.refreshToken
 
             //If refresh token in cookies or cookies is not exist return error message
-            if (!req.cookies.refreshToken && !req.cookies)
+            if (!req.cookies?.refreshToken && !req.cookies)
                 return res.status(401).json({
                     message: 'Refresh token not found',
                 })
@@ -135,14 +135,13 @@ class AuthController {
             // Verify refresh token
             const result = jwt.verify(refreshToken, process.env.TOKEN_SECRET)
 
-            console.log('result: ', result.exp)
+            console.log('result: ', result)
 
             // Find user by id and refresh token
             const user = await User.findOne({
                 _id: result._id,
                 refreshToken: refreshToken,
             }).lean()
-            console.log('user: ', user)
 
             //If user is not exist return error message
             if (!user)
