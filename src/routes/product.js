@@ -8,9 +8,10 @@ const { upload } = require('../app/middlewares/HandleUpdateFile')
 router.post('/comment/:id', [VerifyToken], productController.comment)
 router.put('/comment/:idComment', [VerifyToken], productController.updateComment)
 router.delete('/comment/:idComment', [VerifyToken], productController.deleteComment)
-router.put('/:id', [VerifyToken, VerifyUserIsAdmin], productController.update)
+
+router.put('/:id', [VerifyToken, VerifyUserIsAdmin], upload.array('images', 10), productController.update)
 router.delete('/:id', [VerifyToken, VerifyUserIsAdmin], productController.delete)
-router.post('/', [VerifyToken, VerifyUserIsAdmin], upload.array('images'), productController.create)
+router.post('/', [VerifyToken, VerifyUserIsAdmin], upload.array('images', 10), productController.create)
 router.get('/:slug', productController.info)
 router.get('/', productController.list)
 

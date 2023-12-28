@@ -130,7 +130,9 @@ class ProductController {
 
     // [PUT] /api/product/:id
     async update(req, res, next) {
-        const { title, description, images, price, categoryId, brandId } = req.body
+        const { title, description, price, categoryId, brandId } = req.body
+        let images = req.files
+
         //Get product by id
         const product = await Product.findOne({ _id: req.params.id }).lean()
 
@@ -141,6 +143,12 @@ class ProductController {
             })
 
         try {
+            for (let i = 0; i < images.length; i++) {
+                let image = req.files[i].path
+                image = image.split('src\\public')[1]
+                console.log(`image${i}:`, image)
+                images[i] = image
+            }
             // Update product by id
             await Product.updateOne(
                 {

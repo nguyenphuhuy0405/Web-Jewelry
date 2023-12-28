@@ -209,7 +209,7 @@ class AuthController {
             await user.save()
 
             //Link reset password
-            const link = `<a href="${process.env.BASE_URL}/auth/password-reset/${resetToken}">Click here</a>`
+            const link = `<a href="${process.env.BASE_URL}/api/auth/password-reset/${resetToken}">Click here</a>`
             //Text in email
             const text = 'Password reset link(expire in 15 minutes): ' + link
             //Send email to user

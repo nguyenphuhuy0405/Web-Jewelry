@@ -12,7 +12,7 @@ const cors = require('cors')
 const route = require('./routes/route')
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: process.env.CLIENT_BASE_URL,
     credentials: true, //access-control-allow-credentials:true
     optionSuccessStatus: 200,
 }
