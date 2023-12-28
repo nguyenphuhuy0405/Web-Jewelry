@@ -32,11 +32,17 @@ class ProductController {
     // [GET] /api/product/
     async list(req, res, next) {
         try {
+            //Từ khoá tìm kiếm
             let q = req.query.q
+            //Sắp xếp theo
             let sortBy = {}
+            //Trang ?
             let page = req.query.page
+            //Kích thước của một trang
             let pageSize = req.query.pageSize || 8
+            //Bắt đầu từ phân tử bao nhiêu
             let start = 0
+            //Số phân tử mỗi trang
             let limit = 0
 
             //Search(?q)
@@ -57,9 +63,13 @@ class ProductController {
                 limit = pageSize
             }
 
+            //Get products
             let products = await Product.find(q).sort(sortBy).skip(start).limit(limit).lean()
+            let totalProduct = await Product.countDocuments(q).lean()
+            let totalPage = Math.ceil(totalProduct / pageSize)
 
             return res.status(200).json({
+                totalPage,
                 message: 'Get list of products success',
                 data: products,
             })
@@ -73,6 +83,7 @@ class ProductController {
     // [POST] /api/product/
     async create(req, res, next) {
         const { title, description, price, categoryId, brandId } = req.body
+        let images = req.files
         // Get product by title
         const isExistProduct = await Product.findOne({
             title: req.body.title,
@@ -83,16 +94,18 @@ class ProductController {
             return res.status(400).json({
                 message: 'Product is exist',
             })
-        if (!req.file) {
+        if (!req.files) {
             return res.status(400).json({
                 message: 'Select upload file',
             })
         }
-
         try {
-            let images = req.file.path
-            images = images.split('src\\public')[1]
-            console.log('images', images)
+            for (let i = 0; i < images.length; i++) {
+                let image = req.files[i].path
+                image = image.split('src\\public')[1]
+                console.log(`image${i}:`, image)
+                images[i] = image
+            }
 
             //Create product
             const product = await Product.create({

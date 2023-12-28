@@ -10,7 +10,7 @@ router.put('/comment/:idComment', [VerifyToken], productController.updateComment
 router.delete('/comment/:idComment', [VerifyToken], productController.deleteComment)
 router.put('/:id', [VerifyToken, VerifyUserIsAdmin], productController.update)
 router.delete('/:id', [VerifyToken, VerifyUserIsAdmin], productController.delete)
-router.post('/', [VerifyToken, VerifyUserIsAdmin], upload.single('images'), productController.create)
+router.post('/', [VerifyToken, VerifyUserIsAdmin], upload.array('images'), productController.create)
 router.get('/:slug', productController.info)
 router.get('/', productController.list)
 
