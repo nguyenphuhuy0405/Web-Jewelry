@@ -23,7 +23,7 @@ class InventoryController {
     async list(req, res) {
         try {
             //Get inventory by id
-            const inventories = await Inventory.findOne({})
+            const inventories = await Inventory.find({})
 
             return res.status(200).json({
                 message: 'Get list of inventories success',

@@ -7,12 +7,20 @@ class CartController {
         const userId = req.user._id
         try {
             //Get cart by user id
-            const cart = await Cart.findOne({ userId }).lean().populate('products.productId')
+            const cart = await Cart.findOne({ userId }).populate('products.productId')
             //If cart not exist return error message
             if (!cart)
                 return res.status(404).json({
                     message: 'No product in your cart',
                 })
+
+            //Calculate total price
+            let totalPrice = 0
+            cart.products.forEach((product) => {
+                totalPrice += product.quantity * product.productId.price
+            })
+            cart.totalPrice = totalPrice
+            await cart.save()
 
             return res.status(200).json({
                 message: 'Get cart success',
@@ -36,7 +44,7 @@ class CartController {
             })
 
             //Get product in cart
-            const product = cart.products.find((product) => {
+            const product = cart?.products.find((product) => {
                 if (product.productId === productId) {
                     return product
                 } else {
@@ -181,10 +189,11 @@ class CartController {
             const cart = await Cart.findOne({ userId }).populate('products.productId')
 
             //Calculate total price
+            let totalPrice = 0
             cart.products.forEach((product) => {
-                cart.totalPrice += product.quantity * product.productId.price
+                totalPrice += product.quantity * product.productId.price
             })
-
+            cart.totalPrice = totalPrice
             await cart.save()
 
             return res.status(200).json({
