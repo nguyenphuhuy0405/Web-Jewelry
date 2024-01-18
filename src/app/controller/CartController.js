@@ -6,6 +6,10 @@ class CartController {
     async getCart(req, res) {
         const userId = req.user._id
         try {
+            if (!userId)
+                return res.status(404).json({
+                    message: 'User not found',
+                })
             //Get cart by user id
             const cart = await Cart.findOne({ userId }).populate('products.productId')
             //If cart not exist return error message
@@ -19,12 +23,11 @@ class CartController {
             cart.products.forEach((product) => {
                 totalPrice += product.quantity * product.productId.price
             })
-            cart.totalPrice = totalPrice
-            await cart.save()
 
             return res.status(200).json({
                 message: 'Get cart success',
                 data: cart,
+                totalPrice: totalPrice,
             })
         } catch (error) {
             return res.status(400).json({
@@ -173,61 +176,6 @@ class CartController {
             return res.status(200).json({
                 message: 'Clear cart success',
                 data: cart,
-            })
-        } catch (error) {
-            return res.status(400).json({
-                message: 'An error occured! ' + error,
-            })
-        }
-    }
-
-    //[GET] /api/cart/get-total-price
-    async getTotalPrice(req, res) {
-        const userId = req.user._id
-        try {
-            //Get cart by productId
-            const cart = await Cart.findOne({ userId }).populate('products.productId')
-
-            //Calculate total price
-            let totalPrice = 0
-            cart.products.forEach((product) => {
-                totalPrice += product.quantity * product.productId.price
-            })
-            cart.totalPrice = totalPrice
-            await cart.save()
-
-            return res.status(200).json({
-                message: 'Calculate total price success',
-                data: {
-                    totalPrice: cart.totalPrice,
-                },
-            })
-        } catch (error) {
-            return res.status(400).json({
-                message: 'An error occured! ' + error,
-            })
-        }
-    }
-
-    //[GET] /api/cart/get-total-quantity
-    async getTotalQuantity(req, res) {
-        const userId = req.user._id
-        try {
-            //Get cart by productId
-            const cart = await Cart.findOne({ userId })
-
-            //Calculate total quantity
-            cart.products.forEach((product) => {
-                cart.totalQuantity += product.quantity
-            })
-
-            await cart.save()
-
-            return res.status(200).json({
-                message: 'Calculate total quantity success',
-                data: {
-                    totalQuantity: cart.totalQuantity,
-                },
             })
         } catch (error) {
             return res.status(400).json({

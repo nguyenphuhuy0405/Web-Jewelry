@@ -30,14 +30,14 @@ const CartSchema = new Schema(
                 },
             ],
         },
-        totalQuantity: {
-            type: Number,
-            default: 0,
-        },
-        totalPrice: {
-            type: Number,
-            default: 0,
-        },
+        // totalQuantity: {
+        //     type: Number,
+        //     default: 0,
+        // },
+        // totalPrice: {
+        //     type: Number,
+        //     default: 0,
+        // },
     },
     {
         timestamps: true,

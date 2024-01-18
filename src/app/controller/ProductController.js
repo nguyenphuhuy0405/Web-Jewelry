@@ -44,10 +44,18 @@ class ProductController {
             let start = 0
             //Số phân tử mỗi trang
             let limit = 0
+            //Lọc theo danh mục
+            let categoryId = req.query.categoryId
+            let query = {}
 
             //Search(?q)
             if (req.query.hasOwnProperty('q')) {
-                q = { slug: { $regex: `${q.toLowerCase()}` } }
+                query.slug = { $regex: `${q.toLowerCase()}` }
+            }
+
+            if (req.query.hasOwnProperty('categoryId')) {
+                categoryId = parseInt(categoryId)
+                query.categoryId = categoryId
             }
 
             //Sort(?_sort)
@@ -64,8 +72,8 @@ class ProductController {
             }
 
             //Get products
-            let products = await Product.find(q).sort(sortBy).skip(start).limit(limit).lean()
-            let totalProduct = await Product.countDocuments(q).lean()
+            let products = await Product.find(query).sort(sortBy).skip(start).limit(limit).lean()
+            let totalProduct = await Product.countDocuments(query).lean()
             let totalPage = Math.ceil(totalProduct / pageSize)
 
             return res.status(200).json({

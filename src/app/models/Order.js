@@ -5,20 +5,29 @@ const AutoIncrement = require('mongoose-sequence')(mongoose)
 const OrderSchema = new Schema(
     {
         _id: {
-            type: Number
+            type: Number,
         },
         cartId: {
             type: Schema.Types.ObjectId,
-            ref: 'Cart'
+            ref: 'Cart',
         },
         userId: {
             type: Number,
-            ref: 'User'
+            ref: 'User',
+        },
+        name: {
+            type: String,
+        },
+        address: {
+            type: String,
+        },
+        numberPhone: {
+            type: String,
         },
         status: {
             type: String,
             enum: ['Đang xử lý', 'Đã giao hàng', 'Đã huỷ'],
-            default: 'Đang xử lý'
+            default: 'Đang xử lý',
         },
         shipping: {
             type: String,
@@ -26,30 +35,36 @@ const OrderSchema = new Schema(
         },
         shippingPrice: {
             type: Number,
-            default: 30000
+            default: 30000,
         },
         payment: {
             type: String,
+            enum: ['Thanh toán khi nhận hàng', 'Thanh toán trước'],
             default: 'Thanh toán khi nhận hàng',
-            enum: ['Thanh toán khi nhận hàng', 'Thanh toán trước']
         },
         products: {
-            type: [{
-                productId: {
-                    type: Number,
-                    ref: 'Product'
+            type: [
+                {
+                    productId: {
+                        type: Number,
+                        ref: 'Product',
+                    },
+                    quantity: Number,
                 },
-                quantity: Number
-            }]
+            ],
         },
         totalPrice: {
-            type: Number
-        }
+            type: Number,
+        },
+        notes: {
+            type: String,
+            default: '',
+        },
     },
     {
         timestamps: true,
-        _id: false
-    }
+        _id: false,
+    },
 )
 
 //Add plugin

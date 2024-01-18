@@ -6,6 +6,7 @@ const { VerifyToken, VerifyUserIsAdmin } = require('../app/middlewares/VerifyTok
 router.put('/:id', [VerifyToken, VerifyUserIsAdmin], categoryController.update)
 router.delete('/:id', [VerifyToken, VerifyUserIsAdmin], categoryController.delete)
 router.post('/', [VerifyToken, VerifyUserIsAdmin], categoryController.create)
+router.get('/:id', categoryController.info)
 router.get('/', categoryController.list)
 
 module.exports = router

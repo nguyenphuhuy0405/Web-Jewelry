@@ -4,16 +4,11 @@ class UserController {
     async info(req, res) {
         try {
             //Get user by id
-            const user = await User.findOne({ _id: req.user._id }).lean()
+            const user = await User.findOne({ _id: req.user._id })
 
             return res.json({
                 message: 'Get user info success',
-                data: {
-                    name: user.name,
-                    email: user.email,
-                    address: user.address,
-                    phoneNumber: user.phoneNumber,
-                },
+                data: user,
             })
         } catch (error) {
             return res.status(400).json({

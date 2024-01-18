@@ -1,5 +1,26 @@
 const Category = require('../models/Category')
+const Product = require('../models/Product')
 class CategoryController {
+    //[GET] /api/category/:id
+    async info(req, res) {
+        try {
+            let id = parseInt(req.params.id)
+            //Get categories
+            let products = await Product.find({ categoryId: id }).lean()
+
+            console.log(products)
+
+            return res.status(200).json({
+                message: 'Get products of category success',
+                data: products,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
     //[GET] /api/category/
     async list(req, res) {
         try {
