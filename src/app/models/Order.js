@@ -21,7 +21,7 @@ const OrderSchema = new Schema(
         address: {
             type: String,
         },
-        numberPhone: {
+        phoneNumber: {
             type: String,
         },
         status: {

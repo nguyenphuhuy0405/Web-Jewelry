@@ -8,51 +8,51 @@ require('dotenv').config()
 const UserSchema = new Schema(
     {
         _id: {
-            type: Number
+            type: Number,
         },
         name: {
             type: String,
-            required: true
+            required: true,
         },
         email: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
         },
         password: {
             type: String,
-            required: true
+            required: true,
         },
         address: {
             type: String,
-            required: true
+            required: true,
         },
         phoneNumber: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
         },
         role: {
             type: String,
             trim: true,
-            default: 'user'
+            default: 'user',
         },
         refreshToken: {
-            type: String
+            type: String,
         },
         passwordResetToken: {
             type: String,
-            default: undefined
+            default: undefined,
         },
         passwordResetExpires: {
             type: Date,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     {
         timestamps: true, // add createdAt and updatedAt
-        _id: false
-    }
+        _id: false,
+    },
 )
 
 //Add plugin
@@ -62,7 +62,7 @@ UserSchema.plugin(AutoIncrement, { id: 'userId' })
 //Middleware
 //Encrypting Passwords before Saving
 UserSchema.pre('save', async function (next) {
-    // If password is modified 
+    // If password is modified
     if (this.isModified('password')) {
         //Hash password
         const salt = bcrypt.genSaltSync(10)
@@ -79,13 +79,10 @@ UserSchema.methods = {
     },
     createPasswordResetToken: function () {
         const resetToken = crypto.randomBytes(32).toString('hex')
-        this.passwordResetToken = crypto
-            .createHash('sha256')
-            .update(resetToken)
-            .digest('hex')
+        this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
         this.passwordResetExpires = Date.now() + 15 * 60 * 1000 //15 minutes
         return resetToken
-    }
+    },
 }
 
 module.exports = mongoose.model('User', UserSchema)

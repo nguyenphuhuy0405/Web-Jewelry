@@ -3,6 +3,28 @@ const Order = require('../models/Order')
 const Inventory = require('../models/Inventory')
 
 class OrderController {
+    //[GET] /api/order/:id
+    async info(req, res) {
+        try {
+            const userId = req.user._id
+            const orders = await Order.findOne({ userId: userId, _id: req.params.id }).populate('products.productId')
+            if (!orders) {
+                return res.status(400).json({
+                    message: 'Order is not exist',
+                })
+            }
+
+            return res.status(200).json({
+                message: 'Get order success',
+                data: orders,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
     //[GET] /api/order/
     async list(req, res) {
         try {
@@ -22,7 +44,7 @@ class OrderController {
     //[POST] /api/order/
     async order(req, res) {
         const userId = req.user._id
-        const { productId, quantity, payment, name, address, numberPhone, notes } = req.body
+        const { productId, quantity, payment, name, address, phoneNumber, notes } = req.body
         try {
             //Create order
             const order = await Order.create({
@@ -30,7 +52,7 @@ class OrderController {
                 payment,
                 name,
                 address,
-                numberPhone,
+                phoneNumber,
                 notes,
                 products: {
                     productId,
@@ -42,7 +64,7 @@ class OrderController {
             const stock = await Inventory.updateOne(
                 {
                     productId,
-                    quantity: { $gt: quantity },
+                    quantity: { $gte: quantity },
                 },
                 {
                     $inc: {
@@ -96,7 +118,7 @@ class OrderController {
     async orderFromCart(req, res) {
         try {
             const userId = req.user._id
-            const { cartId, payment, name, address, numberPhone, notes } = req.body
+            const { cartId, payment, name, address, phoneNumber, notes } = req.body
             let message = ''
             //Create order
             const order = await Order.create({
@@ -105,7 +127,7 @@ class OrderController {
                 payment,
                 name,
                 address,
-                numberPhone,
+                phoneNumber,
                 notes,
             })
             //Get order populate cartId
@@ -126,7 +148,7 @@ class OrderController {
                 isEnoughProduct = true
                 const stock = await Inventory.findOne({
                     productId: product.productId,
-                    quantity: { $gt: product.quantity },
+                    quantity: { $gte: product.quantity },
                 })
 
                 //If enough product in inventory
@@ -144,7 +166,7 @@ class OrderController {
                     await Inventory.updateOne(
                         {
                             productId: product.productId,
-                            quantity: { $gt: product.quantity },
+                            quantity: { $gte: product.quantity },
                         },
                         {
                             //Decrease quantity in inventory
@@ -189,7 +211,7 @@ class OrderController {
                     }, 0) + updateOrder.shippingPrice
 
                 return res.status(200).json({
-                    message,
+                    message: 'Order success',
                     data: updateOrder,
                 })
             } else {
@@ -197,7 +219,7 @@ class OrderController {
                 //Remove order
                 await order.remove()
                 return res.status(400).json({
-                    message,
+                    message: 'Not enough product in inventory',
                 })
             }
         } catch (error) {

@@ -40,6 +40,7 @@ class CartController {
     async addToCart(req, res) {
         const userId = req.user._id
         const productId = Number.parseInt(req.params.productId)
+        const { quantity = '1' } = req.body
         try {
             //Get cart by productId
             const cart = await Cart.findOne({
@@ -58,7 +59,7 @@ class CartController {
             //If product already exist in cart increase quantity
             if (product) {
                 //Increase quantity
-                product.quantity += 1
+                product.quantity += Number.parseInt(quantity)
 
                 //Save cart
                 await cart.save()
@@ -72,7 +73,7 @@ class CartController {
                         $push: {
                             products: {
                                 productId,
-                                quantity: 1,
+                                quantity: quantity,
                             },
                         },
                     },
@@ -98,10 +99,9 @@ class CartController {
 
     //[PUT] /api/cart/
     async updateCart(req, res) {
-        const userId = req.user._id
-        const { productId, quantity } = req.body
-
         try {
+            const userId = req.user._id
+            const { productId, quantity } = req.body
             //Get cart by productId
             const cart = await Cart.findOne({ userId })
 

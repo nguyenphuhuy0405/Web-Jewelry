@@ -53,12 +53,35 @@ class UserController {
             const user = await User.findOne({ _id: req.user._id }).lean()
             return res.json({
                 message: 'Update user success',
-                data: {
-                    name: user.name,
-                    email: user.email,
-                    address: user.address,
-                    phoneNumber: user.phoneNumber,
+                data: user,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
+    // [PUT] /api/user/update:id
+    async updateInfo(req, res) {
+        const { name, address } = req.body
+        try {
+            //Update user by id
+            await User.updateOne(
+                {
+                    _id: req.params.id,
                 },
+                {
+                    name,
+                    address,
+                },
+            )
+
+            //Find new user by id
+            const user = await User.findOne({ _id: req.user._id }).lean()
+            return res.json({
+                message: 'Update user success',
+                data: user,
             })
         } catch (error) {
             return res.status(400).json({
@@ -101,7 +124,7 @@ class UserController {
     // [DELETE] /api/user/:id
     async delete(req, res) {
         //Get user by id
-        const user = await User.findOne({ _id: req.params.id }).lean()
+        const user = await User.findOne({ _id: req.params.id })
 
         //If user is not exist return error message
         if (!user)
@@ -111,7 +134,7 @@ class UserController {
 
         try {
             //Delete user by id
-            await user.deleteOne({ _id: req.params.id }).lean()
+            await user.deleteOne({ _id: req.params.id })
 
             return res.json({
                 message: 'Delete user success',

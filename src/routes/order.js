@@ -7,6 +7,7 @@ router.put('/confirm-order/:id', [VerifyToken, VerifyUserIsAdmin], orderControll
 router.put('/candle-order/:id', [VerifyToken, VerifyUserIsAdmin], orderController.candleOrder)
 router.post('/order-from-cart', [VerifyToken], orderController.orderFromCart)
 router.post('/', [VerifyToken], orderController.order)
+router.get('/:id', [VerifyToken], orderController.info)
 router.get('/', [VerifyToken, VerifyUserIsAdmin], orderController.list)
 
 module.exports = router

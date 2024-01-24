@@ -7,6 +7,11 @@ class InventoryController {
         try {
             //Get inventory by id
             const inventory = await Inventory.findOne({ _id: id })
+            if (!inventory) {
+                return res.status(400).json({
+                    message: 'Inventory of product is not exist',
+                })
+            }
 
             return res.status(200).json({
                 message: 'Get inventory success',
