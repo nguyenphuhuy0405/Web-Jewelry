@@ -1,12 +1,12 @@
 const Inventory = require('../models/Inventory')
+const Product = require('../models/Product')
 
 class InventoryController {
     //[GET] /api/inventory/:id
     async info(req, res) {
-        const id = req.params.id
         try {
-            //Get inventory by id
-            const inventory = await Inventory.findOne({ _id: id })
+            //Get inventory by product id
+            const inventory = await Inventory.findOne({ productId: req.params.id })
             if (!inventory) {
                 return res.status(400).json({
                     message: 'Inventory of product is not exist',
@@ -28,7 +28,7 @@ class InventoryController {
     async list(req, res) {
         try {
             //Get inventory by id
-            const inventories = await Inventory.find({})
+            const inventories = await Inventory.find({}).populate('productId')
 
             return res.status(200).json({
                 message: 'Get list of inventories success',
@@ -43,15 +43,22 @@ class InventoryController {
 
     //[POST] /api/inventory/
     async create(req, res) {
-        const { productId, quantity } = req.body
-
-        const inventory = await Inventory.findOne({ productId: productId })
-        if (inventory)
-            return res.status(400).json({
-                message: 'Inventory of product is exist',
-            })
-
         try {
+            const { productId, quantity } = req.body
+            //Check if product is exist
+            const product = await Product.findOne({ _id: productId })
+            if (!product)
+                return res.status(400).json({
+                    message: 'Product is not exist',
+                })
+
+            //Check if inventory is exist
+            const inventory = await Inventory.findOne({ productId: productId })
+            if (inventory)
+                return res.status(400).json({
+                    message: 'Inventory of product is exist',
+                })
+
             //Create inventory
             const newInventory = await Inventory.create({
                 productId,
@@ -70,18 +77,17 @@ class InventoryController {
     }
 
     //[PUT] /api/inventory/:id
-    async increase(req, res) {
-        const id = req.params.id
-        const { quantity } = req.body
+    async update(req, res) {
         try {
+            const id = req.params.id
+            const { quantity } = req.body
+
             await Inventory.updateOne(
                 {
                     _id: id,
                 },
                 {
-                    $inc: {
-                        quantity: quantity,
-                    },
+                    quantity: quantity,
                 },
             )
 
@@ -89,6 +95,22 @@ class InventoryController {
             return res.status(200).json({
                 message: 'Update inventory success',
                 data: inventory,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
+    //[DELETE] /api/inventory/:id
+    async delete(req, res) {
+        try {
+            //Delete user by id
+            await Inventory.deleteOne({ _id: req.params.id })
+
+            return res.status(200).json({
+                message: 'Delete inventory success',
             })
         } catch (error) {
             return res.status(400).json({

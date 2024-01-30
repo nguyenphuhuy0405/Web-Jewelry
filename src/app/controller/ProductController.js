@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 
 const Product = require('../models/Product')
 const User = require('../models/User')
@@ -151,6 +152,21 @@ class ProductController {
             })
 
         try {
+            //Delete product images from public folder
+            product.images.forEach((filePath) => {
+                // Create the full path by joining the base path and the file path
+                const fullPath = path.join(__dirname, '../../../src/public', filePath)
+                console.log(fullPath)
+                // Use fs.unlink to delete the file
+                fs.unlink(fullPath, (err) => {
+                    if (err) {
+                        console.error('Error deleting file:', err)
+                    } else {
+                        console.log(`File deleted successfully: ${fullPath}`)
+                    }
+                })
+            })
+
             for (let i = 0; i < images.length; i++) {
                 let image = req.files[i].path
                 image = image.split('src\\public')[1]
@@ -201,6 +217,21 @@ class ProductController {
             })
 
         try {
+            //Delete product images from public folder
+            product.images.forEach((filePath) => {
+                // Create the full path by joining the base path and the file path
+                const fullPath = path.join(__dirname, '../../../src/public', filePath)
+                console.log(fullPath)
+                // Use fs.unlink to delete the file
+                fs.unlink(fullPath, (err) => {
+                    if (err) {
+                        console.error('Error deleting file:', err)
+                    } else {
+                        console.log(`File deleted successfully: ${fullPath}`)
+                    }
+                })
+            })
+
             // Delete product by id
             await Product.deleteOne({ _id: req.params.id })
 

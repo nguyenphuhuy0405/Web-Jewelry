@@ -28,7 +28,7 @@ class OrderController {
     //[GET] /api/order/
     async list(req, res) {
         try {
-            const orders = await Order.find({}).populate('userId').lean()
+            const orders = await Order.find({}).sort({ createdAt: -1 }).populate('products.productId')
 
             return res.status(200).json({
                 message: 'Get list of orders success',
@@ -93,6 +93,9 @@ class OrderController {
                     newOrder.products.reduce((total, product) => {
                         return total + product.quantity * product.productId.price
                     }, 0) + newOrder.shippingPrice
+
+                //Save order
+                await newOrder.save()
 
                 return res.status(200).json({
                     message: 'Order success',
@@ -210,6 +213,9 @@ class OrderController {
                         return total + product.quantity * product.productId.price
                     }, 0) + updateOrder.shippingPrice
 
+                //Save order
+                await updateOrder.save()
+
                 return res.status(200).json({
                     message: 'Order success',
                     data: updateOrder,
@@ -250,8 +256,8 @@ class OrderController {
         }
     }
 
-    //[PUT] /api/order/candle-order/:id
-    async candleOrder(req, res) {
+    //[PUT] /api/order/cancel-order/:id
+    async cancelOrder(req, res) {
         const id = req.params.id
         try {
             //Get order by id

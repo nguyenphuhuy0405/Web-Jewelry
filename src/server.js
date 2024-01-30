@@ -17,8 +17,10 @@ const corsOptions = {
     optionSuccessStatus: 200,
 }
 
+const publicDir = path.join(__dirname, '/public')
+
 //Static file
-app.use(express.static(path.join(__dirname, '/public')))
+app.use(express.static(publicDir))
 
 //Cookie-parser
 app.use(cookieParser())
