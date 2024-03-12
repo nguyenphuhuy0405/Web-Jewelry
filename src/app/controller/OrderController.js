@@ -241,6 +241,14 @@ class OrderController {
         try {
             //Get order by id
             const order = await Order.findOne({ _id: id })
+
+            //Check if order is not processing
+            if (order.status !== 'Đang xử lý') {
+                return res.status(400).json({
+                    message: 'Order is not processing',
+                })
+            }
+
             //Change order status when confirm order
             order.status = 'Đã giao hàng'
             //Save order in db
@@ -262,6 +270,14 @@ class OrderController {
         try {
             //Get order by id
             const order = await Order.findOne({ _id: id })
+
+            //Check if order is not processing
+            if (order.status !== 'Đang xử lý') {
+                return res.status(400).json({
+                    message: 'Order is not processing',
+                })
+            }
+
             //Change order status when confirm order
             order.status = 'Đã huỷ'
             //Save order in db

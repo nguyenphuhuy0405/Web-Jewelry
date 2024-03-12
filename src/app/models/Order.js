@@ -35,7 +35,7 @@ const OrderSchema = new Schema(
         },
         shippingPrice: {
             type: Number,
-            default: 30000,
+            default: 0,
         },
         payment: {
             type: String,

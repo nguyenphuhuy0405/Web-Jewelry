@@ -163,6 +163,7 @@ class AuthController {
     // [POST] /api/auth/logout
     async logout(req, res) {
         try {
+            const userId = req.user._id
             // Get refresh token from cookies
             //const { refreshToken } = req.cookies
 
@@ -175,12 +176,20 @@ class AuthController {
             //Set refreshToken in res
             //res.cookie('refreshToken', refreshToken)
 
-            // Destroy refresh token
-            localStorage.removeItem('accessToken')
+            //Delete refresh token in database
+            await User.updateOne(
+                {
+                    _id: userId,
+                },
+                {
+                    refreshToken: '',
+                },
+            )
+
+            // Destroy refresh token in cookies
             res.clearCookie('refreshToken')
 
             return res.status(200).json({
-                isLogin: false,
                 message: 'Logout success',
             })
         } catch (error) {
