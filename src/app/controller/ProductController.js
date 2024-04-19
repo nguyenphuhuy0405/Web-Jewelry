@@ -10,7 +10,12 @@ class ProductController {
     // [GET] /api/product/:slug
     async info(req, res, next) {
         //Get product by slug
-        const product = await Product.findOne({ slug: req.params.slug }).populate('comments').lean()
+        const product = await Product.findOne({ slug: req.params.slug }).populate({
+            path: 'comments',
+            populate: {
+                path: 'userId',
+            },
+        })
         // console.log(product)
         //If product is not exist return error message
         if (!product)
@@ -167,14 +172,16 @@ class ProductController {
                 })
             })
 
+            //Get images links
             for (let i = 0; i < images.length; i++) {
                 let image = req.files[i].path
                 image = image.split('src\\public')[1]
                 console.log(`image${i}:`, image)
                 images[i] = image
             }
+
             // Update product by id
-            await Product.updateOne(
+            const newProduct = await Product.updateOne(
                 {
                     _id: req.params.id,
                 },
@@ -188,14 +195,11 @@ class ProductController {
                 },
             )
 
-            // Find new product by id
-            const newProduct = await Product.findOne({
-                _id: req.params.id,
-            }).lean()
+            //Save product
+            await newProduct.save()
 
             return res.status(200).json({
                 message: 'Update product success',
-                oldData: product,
                 data: newProduct,
             })
         } catch (error) {
@@ -246,35 +250,33 @@ class ProductController {
     }
 
     //[POST] /api/product/comment/:id
-    async comment(req, res, next) {
+    async comment(req, res) {
         try {
-            const { star, content } = req.body
-            //Get user by id
-            const user = await User.findOne({ _id: req.user._id }).lean()
+            const { star, content, productId } = req.body
+            console.log(req.user._id)
 
             // Create comment
             const comment = await Comment.create({
                 star,
                 content,
-                user: user._id,
+                userId: req.user._id,
+            }).then((comment) => {
+                return Comment.populate(comment, { path: 'userId' })
             })
 
             // Push comment id in product
             await Product.updateOne(
-                { _id: req.params.id },
+                {
+                    _id: productId,
+                },
                 {
                     $push: { comments: comment._id },
                 },
             )
 
-            // Get new product by id
-            const product = await Product.findOne({
-                _id: req.params.id,
-            }).lean()
-
             return res.status(200).json({
                 message: 'Comment product success',
-                data: product,
+                data: comment,
             })
         } catch (error) {
             return res.status(400).json({
@@ -283,12 +285,12 @@ class ProductController {
         }
     }
 
-    // [PUT] /api/product/comment/:idComment
+    // [PUT] /api/product/comment/
     async updateComment(req, res, next) {
-        const { star, content } = req.body
-        //Get comment by idComment
+        const { star, content, commentId } = req.body
+        //Get comment by commentId
         const comment = await Comment.findOne({
-            _id: req.params.idComment,
+            _id: commentId,
         })
 
         //If comment is not exist return error message
@@ -298,24 +300,15 @@ class ProductController {
             })
 
         try {
-            //Update comment by idComment
-            await Comment.updateOne(
-                { _id: req.params.idComment },
-                {
-                    star,
-                    content,
-                },
-            )
+            //Update comment
+            comment.star = star
+            comment.content = content
 
-            //Get new comment by idComment
-            const newComment = await Comment.findOne({
-                _id: req.params.idComment,
-            }).lean()
+            //Save comment
+            await comment.save()
 
             return res.status(200).json({
                 message: 'Update comment success',
-                oldData: comment,
-                data: newComment,
             })
         } catch (error) {
             return res.status(400).json({
@@ -324,10 +317,11 @@ class ProductController {
         }
     }
 
-    // [DELETE] /api/product/comment/:idComment
-    async deleteComment(req, res, next) {
-        // Get comment by idComment
-        const comment = await Comment.findOne({ _id: req.params.idComment })
+    // [DELETE] /api/product/comment
+    async deleteComment(req, res) {
+        const { commentId } = req.body
+        // Get comment by commentId
+        const comment = await Comment.findOne({ _id: commentId })
 
         //If comment is not exist return error message
         if (!comment)
@@ -335,9 +329,14 @@ class ProductController {
                 message: 'Comment is not exist',
             })
 
+        if (!comment.userId === req.user._id)
+            return res.status(400).json({
+                message: 'You not author of this comment',
+            })
+
         try {
             // Delete comment by idComment
-            await Comment.deleteOne({ _id: req.params.idComment }).lean()
+            await comment.delete()
 
             return res.status(200).json({
                 message: 'Delete comment success',

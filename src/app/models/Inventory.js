@@ -5,36 +5,36 @@ const AutoIncrement = require('mongoose-sequence')(mongoose)
 const InventorySchema = new Schema(
     {
         _id: {
-            type: Number
+            type: Number,
         },
         productId: {
             type: Number,
-            ref: 'Product'
+            ref: 'Product',
         },
         quantity: {
-            type: Number
+            type: Number,
         },
         orders: {
             type: [
                 {
                     orderId: {
                         type: Number,
-                        ref: 'Order'
+                        ref: 'Order',
                     },
                     userId: {
                         type: Number,
-                        ref: 'User'
+                        ref: 'User',
                     },
-                    quantity: Number
-                }
+                    quantity: Number,
+                },
             ],
-            default: []
+            default: [],
         },
     },
     {
         timestamps: true,
-        _id: false
-    }
+        _id: false,
+    },
 )
 
 //Add plugin

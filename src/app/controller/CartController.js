@@ -39,8 +39,7 @@ class CartController {
     //[POST] /api/cart/
     async addToCart(req, res) {
         const userId = req.user._id
-        const productId = Number.parseInt(req.params.productId)
-        const { quantity = '1' } = req.body
+        const { productId, quantity = '1' } = req.body
         try {
             //Get cart by productId
             const cart = await Cart.findOne({
@@ -49,7 +48,7 @@ class CartController {
 
             //Get product in cart
             const product = cart?.products.find((product) => {
-                if (product.productId === productId) {
+                if (product.productId === Number.parseInt(productId)) {
                     return product
                 } else {
                     return null
@@ -128,7 +127,7 @@ class CartController {
     //[DELETE] /api/cart/:productId
     async removeToCart(req, res) {
         const userId = req.user._id
-        const productId = req.params.productId
+        const { productId } = req.body
         try {
             //Find cart by userId and push product (if not exist create new cart)
             await Cart.findOneAndUpdate(

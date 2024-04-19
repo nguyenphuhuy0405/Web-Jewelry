@@ -5,9 +5,9 @@ const productController = require('../app/controller/ProductController')
 const { VerifyToken, VerifyUserIsAdmin } = require('../app/middlewares/VerifyToken')
 const { upload } = require('../app/middlewares/HandleUpdateFile')
 
-router.post('/comment/:id', [VerifyToken], productController.comment)
-router.put('/comment/:idComment', [VerifyToken], productController.updateComment)
-router.delete('/comment/:idComment', [VerifyToken], productController.deleteComment)
+router.post('/comment', [VerifyToken], productController.comment)
+router.put('/comment', [VerifyToken], productController.updateComment)
+router.delete('/comment', [VerifyToken], productController.deleteComment)
 
 router.put('/:id', [VerifyToken, VerifyUserIsAdmin], upload.array('images', 10), productController.update)
 router.delete('/:id', [VerifyToken, VerifyUserIsAdmin], productController.delete)

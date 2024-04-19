@@ -3,7 +3,7 @@ const app = express()
 
 const path = require('path')
 const morgan = require('morgan')
-const connectDB = require('./config/db/connectDB')
+const connectDB = require('./config/connectDB')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 require('dotenv').config()

@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 // Generate access token
 function generateAccessToken(userId, role) {
     return jwt.sign({ _id: userId, role: role }, process.env.TOKEN_SECRET, {
-        expiresIn: '1d',
+        expiresIn: '1m',
     }) //5 minutes
 }
 

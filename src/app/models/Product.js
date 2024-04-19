@@ -7,65 +7,84 @@ const AutoIncrement = require('mongoose-sequence')(mongoose)
 const ProductSchema = new Schema(
     {
         _id: {
-            type: Number
+            type: Number,
         },
         title: {
             type: String,
             required: true,
-            trim: true
+            trim: true,
         },
         slug: {
             type: String,
             slug: 'title',
-            unique: true
+            unique: true,
         },
         description: {
             type: String,
-            required: true
         },
         price: {
             type: Number,
-            required: true
+            required: true,
         },
         images: {
             type: Array,
-            default: []
+            default: [],
         },
         categoryId: {
             type: Number,
             required: true,
-            ref: 'Category'
+            ref: 'Category',
         },
         brandId: {
             type: Number,
-            ref: 'Brand'
+            ref: 'Brand',
+        },
+        variations: {
+            type: [
+                {
+                    color: String,
+                    size: String,
+                    material: String,
+                    stock: Number,
+                },
+            ],
+            required: true,
+        },
+        attributes: {
+            type: [
+                {
+                    name: {
+                        type: String,
+                        required: true,
+                    },
+                    value: {
+                        type: String,
+                        required: true,
+                    },
+                    units: {
+                        type: String,
+                    },
+                },
+            ],
+            default: [],
         },
         totalRatings: {
-            type: Number
+            type: Number,
         },
         comments: {
             type: [
                 {
                     type: Number,
-                    ref: 'Comment'
-                }
+                    ref: 'Comment',
+                },
             ],
-            default: []
+            default: [],
         },
-        specs: {
-            type: [{
-                k: String,
-                v: String,
-                m: String
-            }],
-            default: []
-        },
-
     },
     {
         timestamps: true,
-        _id: false
-    }
+        _id: false,
+    },
 )
 
 //Middleware
@@ -74,7 +93,7 @@ ProductSchema.pre('save', async function (next) {
     // if sizes is modified
     if (this.isModified('sizes')) {
         //Count total quantity
-        const totalQuantity = this.sizes.reduce((acc, size) => { 
+        const totalQuantity = this.sizes.reduce((acc, size) => {
             return acc + size.quantity
         }, 0)
         this.totalQuantity = totalQuantity

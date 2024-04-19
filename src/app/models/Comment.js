@@ -5,25 +5,32 @@ const AutoIncrement = require('mongoose-sequence')(mongoose)
 const CommentSchema = new Schema(
     {
         _id: {
-            type: Number
+            type: Number,
         },
         star: {
             type: Number,
-            required: true
+            required: true,
+            min: 1,
+            max: 5,
         },
         userId: {
             type: Number,
-            ref: 'User'
+            ref: 'User',
         },
         content: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
+        isDelete: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
     },
     {
         timestamps: true,
-        _id: false
-    }
+        _id: false,
+    },
 )
 //Add plugin
 mongoose.set('strictQuery', false)

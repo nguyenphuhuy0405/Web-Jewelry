@@ -5,8 +5,8 @@ const { VerifyToken, VerifyUserIsAdmin } = require('../app/middlewares/VerifyTok
 
 router.get('/', [VerifyToken], cartController.getCart)
 router.put('/', [VerifyToken], cartController.updateCart)
-router.delete('/', [VerifyToken], cartController.clearCart)
-router.delete('/:productId', [VerifyToken], cartController.removeToCart)
-router.post('/:productId', [VerifyToken], cartController.addToCart)
+router.delete('/clear', [VerifyToken], cartController.clearCart)
+router.delete('/', [VerifyToken], cartController.removeToCart)
+router.post('/', [VerifyToken], cartController.addToCart)
 
 module.exports = router
