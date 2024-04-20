@@ -218,13 +218,13 @@ class AuthController {
             await user.save()
 
             //Link reset password
-            const link = `<a href="${process.env.BASE_URL}/api/auth/password-reset/${resetToken}">Click here</a>`
+            const link = `<a href="${process.env.CLIENT_BASE_URL}/reset-password/${resetToken}">Click here</a>`
             //Text in email
             const text = 'Password reset link(expire in 15 minutes): ' + link
             //Send email to user
             await sendEmail(user.email, 'Password reset', text)
 
-            return res.status(404).json({
+            return res.status(200).json({
                 message: 'Password reset link sent to your email account',
             })
         } catch (error) {
@@ -261,7 +261,7 @@ class AuthController {
             //Save user in db
             await user.save()
 
-            return res.status(404).json({
+            return res.status(200).json({
                 message: 'Password reset successfully',
             })
         } catch (error) {

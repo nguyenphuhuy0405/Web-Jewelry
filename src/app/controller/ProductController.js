@@ -264,8 +264,10 @@ class ProductController {
                 return Comment.populate(comment, { path: 'userId' })
             })
 
+            console.log('comment', comment)
+
             // Push comment id in product
-            await Product.updateOne(
+            const stock = await Product.updateOne(
                 {
                     _id: productId,
                 },
@@ -273,6 +275,14 @@ class ProductController {
                     $push: { comments: comment._id },
                 },
             )
+
+            if (stock?.modifiedCount != 1) {
+                // Delete comment
+                await comment.remove()
+                return res.status(400).json({
+                    message: 'Comment product failed',
+                })
+            }
 
             return res.status(200).json({
                 message: 'Comment product success',
