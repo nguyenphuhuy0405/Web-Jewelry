@@ -4,13 +4,12 @@ const userController = require('../app/controller/UserController')
 const { VerifyToken, VerifyUserIsAdmin } = require('../app/middlewares/VerifyToken')
 
 router.get('/info', [VerifyToken], userController.info)
-// [PUT] /api/user/update
-router.put('/', [VerifyToken], userController.update)
 router.put('/change-password', [VerifyToken], userController.changePassword)
-router.put('/:id', [VerifyToken], userController.updateInfo)
+router.put('/', [VerifyToken], userController.update)
 
 //Required Role Admin
-router.get('/', [VerifyToken, VerifyUserIsAdmin], userController.list)
+router.put('/:id', [VerifyToken, VerifyUserIsAdmin], userController.updateInfo)
 router.delete('/:id', [VerifyToken, VerifyUserIsAdmin], userController.delete)
+router.get('/', [VerifyToken, VerifyUserIsAdmin], userController.list)
 
 module.exports = router

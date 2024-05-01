@@ -5,10 +5,22 @@ class UserController {
         try {
             //Get user by id
             const user = await User.findOne({ _id: req.user._id })
+            if (!user) {
+                return res.status(404).json({
+                    message: 'User not found',
+                })
+            }
 
             return res.json({
                 message: 'Get user info success',
-                data: user,
+                data: {
+                    _id: user?._id,
+                    name: user?.name,
+                    address: user?.address,
+                    phoneNumber: user?.phoneNumber,
+                    role: user?.role,
+                    email: user?.email,
+                },
             })
         } catch (error) {
             return res.status(400).json({
@@ -37,11 +49,12 @@ class UserController {
     // [PUT] /api/user/update
     async update(req, res) {
         const { name, address } = req.body
+        const id = Number.parseInt(req.user._id)
         try {
             //Update user by id
-            await User.updateOne(
+            const user = await User.updateOne(
                 {
-                    _id: req.user._id,
+                    _id: id,
                 },
                 {
                     name,
@@ -49,11 +62,24 @@ class UserController {
                 },
             )
 
+            if (user.modifiedCount != 1) {
+                return res.status(400).json({
+                    message: 'Update user failed',
+                })
+            }
+
             //Find new user by id
-            const user = await User.findOne({ _id: req.user._id }).lean()
+            const updateUser = await User.findOne({ _id: id }).lean()
             return res.json({
                 message: 'Update user success',
-                data: user,
+                data: {
+                    _id: updateUser?._id,
+                    name: updateUser?.name,
+                    address: updateUser?.address,
+                    phoneNumber: updateUser?.phoneNumber,
+                    role: updateUser?.role,
+                    email: updateUser?.email,
+                },
             })
         } catch (error) {
             return res.status(400).json({
@@ -62,7 +88,7 @@ class UserController {
         }
     }
 
-    // [PUT] /api/user/update:id
+    // [PUT] /api/user/update/:id
     async updateInfo(req, res) {
         const { name, address } = req.body
         try {

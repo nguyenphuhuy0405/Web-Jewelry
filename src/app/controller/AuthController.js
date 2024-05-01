@@ -163,31 +163,33 @@ class AuthController {
     // [POST] /api/auth/logout
     async logout(req, res) {
         try {
-            const userId = req.user._id
-            // Get refresh token from cookies
-            //const { refreshToken } = req.cookies
-
             // Check refresh token
             if (!req.cookies.refreshToken && !req.cookies)
                 return res.status(401).json({
                     message: 'Refresh token not found',
                 })
 
-            //Set refreshToken in res
-            //res.cookie('refreshToken', refreshToken)
-
             //Delete refresh token in database
-            await User.updateOne(
+            const user = await User.updateOne(
                 {
-                    _id: userId,
+                    refreshToken: req.cookies.refreshToken,
                 },
                 {
                     refreshToken: '',
                 },
             )
+            if (user.modifiedCount != 1) {
+                return res.status(400).json({
+                    message: 'Logout failed',
+                })
+            }
 
             // Destroy refresh token in cookies
-            res.clearCookie('refreshToken')
+            res.clearCookie('refreshToken'),
+                {
+                    httpOnly: true,
+                    success: true,
+                }
 
             return res.status(200).json({
                 message: 'Logout success',
