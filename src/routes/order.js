@@ -7,6 +7,7 @@ router.put('/confirm-order/:id', [VerifyToken, VerifyUserIsAdmin], orderControll
 router.put('/cancel-order/:id', [VerifyToken, VerifyUserIsAdmin], orderController.cancelOrder)
 router.post('/order-from-cart', [VerifyToken], orderController.orderFromCart)
 router.post('/', [VerifyToken], orderController.order)
+router.get('/analyze', [VerifyToken, VerifyUserIsAdmin], orderController.analyze)
 router.get('/:id', [VerifyToken], orderController.info)
 router.get('/', [VerifyToken, VerifyUserIsAdmin], orderController.list)
 

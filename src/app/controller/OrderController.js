@@ -1,6 +1,7 @@
 const Cart = require('../models/Cart')
 const Order = require('../models/Order')
 const Inventory = require('../models/Inventory')
+const moment = require('moment')
 
 class OrderController {
     //[GET] /api/order/:id
@@ -33,6 +34,86 @@ class OrderController {
             return res.status(200).json({
                 message: 'Get list of orders success',
                 data: orders,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
+    //[GET] /api/order/analyze
+    async analyze(req, res) {
+        try {
+            const day = req.query.day
+            const month = req.query.month
+            const year = req.query.year
+            const isValidDay = day && moment(day, 'YYYY-MM-DD', true).isValid() ? true : false
+            const isValidMonth = month && moment(month, 'YYYY-MM', true).isValid() ? true : false
+            const isValidYear = year && moment(year, 'YYYY', true).isValid() ? true : false
+            let query = {}
+
+            if (!isValidDay && !isValidMonth && !isValidYear) {
+                return res.status(400).json({
+                    message: 'Invalid day format. Use YYYY-MM-DD for day. Use YYYY-MM for month. Use YYYY for year',
+                })
+            }
+
+            //Case 1: filter by day || month || year
+            if (isValidDay) {
+                query = {
+                    createdAt: {
+                        $gte: moment(day).startOf('day').toDate(),
+                        $lte: moment(day).endOf('day').toDate(),
+                    },
+                }
+            } else if (isValidMonth) {
+                query = {
+                    createdAt: {
+                        $gte: moment(month).startOf('month').toDate(),
+                        $lte: moment(month).endOf('month').toDate(),
+                    },
+                }
+            } else if (isValidYear) {
+                query = {
+                    createdAt: {
+                        $gte: moment(year).startOf('year').toDate(),
+                        $lte: moment(year).endOf('year').toDate(),
+                    },
+                }
+            }
+
+            console.log(query)
+            //Get order by query
+            const orders = await Order.find(query)
+
+            //Get total sales of orders
+            const totalSales = orders.reduce((total, order) => {
+                return order?.totalPrice ? total + order.totalPrice : total
+            }, 0)
+
+            //Get total order
+            const totalOrders = orders.length
+
+            //Get total order confirm
+            const totalOrderConfirm = orders.filter((order) => order.status === 'Đã giao hàng').length
+
+            //Get total order not confirm
+            const totalOrderNotConfirm = orders.filter((order) => order.status === 'Đang xử lý').length
+
+            //Get total order cancel
+            const totalOrderCancel = orders.filter((order) => order.status === 'Đã huỷ').length
+
+            return res.status(200).json({
+                message: `Get analyze of orders in`,
+                data: {
+                    totalSales,
+                    totalOrders,
+                    totalOrderConfirm,
+                    totalOrderNotConfirm,
+                    totalOrderCancel,
+                    orders,
+                },
             })
         } catch (error) {
             return res.status(400).json({
