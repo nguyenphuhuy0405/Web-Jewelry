@@ -10,9 +10,12 @@ const InventorySchema = new Schema(
         productId: {
             type: Number,
             ref: 'Product',
+            required: true,
         },
         quantity: {
             type: Number,
+            required: true,
+            default: 0,
         },
         orders: {
             type: [
@@ -20,10 +23,12 @@ const InventorySchema = new Schema(
                     orderId: {
                         type: Number,
                         ref: 'Order',
+                        required: true,
                     },
                     userId: {
                         type: Number,
                         ref: 'User',
+                        required: true,
                     },
                     quantity: Number,
                 },

@@ -9,10 +9,12 @@ const OrderSchema = new Schema(
         },
         cartId: {
             type: Schema.Types.ObjectId,
+            required: true,
             ref: 'Cart',
         },
         userId: {
             type: Number,
+            required: true,
             ref: 'User',
         },
         name: {
@@ -20,13 +22,16 @@ const OrderSchema = new Schema(
         },
         address: {
             type: String,
+            required: true,
         },
         phoneNumber: {
             type: String,
+            required: true,
         },
         status: {
             type: String,
-            enum: ['Đang xử lý', 'Đã giao hàng', 'Đã huỷ'],
+            enum: ['Đang xử lý', 'Đã giao hàng', 'Đã huỷ', 'Đã hoàn thành'],
+            required: true,
             default: 'Đang xử lý',
         },
         shipping: {
@@ -52,9 +57,11 @@ const OrderSchema = new Schema(
                     quantity: Number,
                 },
             ],
+            required: true,
         },
         totalPrice: {
             type: Number,
+            required: true,
         },
         notes: {
             type: String,

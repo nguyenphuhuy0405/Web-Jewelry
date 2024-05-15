@@ -26,6 +26,28 @@ class OrderController {
         }
     }
 
+    //[GET] /api/order/my-orders
+    async myOrders(req, res) {
+        try {
+            const userId = req.user._id
+            const orders = await Order.find({ userId: userId }).sort({ createdAt: -1 }).populate('products.productId')
+            if (!orders) {
+                return res.status(400).json({
+                    message: 'Order is not exist',
+                })
+            }
+
+            return res.status(200).json({
+                message: 'Get my orders success',
+                data: orders,
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
     //[GET] /api/order/
     async list(req, res) {
         try {
@@ -95,6 +117,9 @@ class OrderController {
             //Get total order
             const totalOrders = orders.length
 
+            //Get total order finish
+            const totalOrderFinish = orders.filter((order) => order.status === 'Đã hoàn thành').length
+
             //Get total order confirm
             const totalOrderConfirm = orders.filter((order) => order.status === 'Đã giao hàng').length
 
@@ -109,6 +134,7 @@ class OrderController {
                 data: {
                     totalSales,
                     totalOrders,
+                    totalOrderFinish,
                     totalOrderConfirm,
                     totalOrderNotConfirm,
                     totalOrderCancel,
@@ -349,14 +375,23 @@ class OrderController {
     //[PUT] /api/order/cancel-order/:id
     async cancelOrder(req, res) {
         const id = req.params.id
+        const userId = req.user._id
+        const userRole = req.user.role
+        console.log(id)
         try {
             //Get order by id
             const order = await Order.findOne({ _id: id })
 
             //Check if order is not processing
-            if (order.status !== 'Đang xử lý') {
+            if (order.status === 'Đã hoàn thành') {
                 return res.status(400).json({
-                    message: 'Order is not processing',
+                    message: 'Order is finished',
+                })
+            }
+
+            if (userRole != 'admin' && userId != order.userId) {
+                return res.status(400).json({
+                    message: 'Order is not belong to user',
                 })
             }
 
@@ -390,6 +425,42 @@ class OrderController {
             return res.status(200).json({
                 message: 'Candle order success',
             })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
+    //[PUT] /api/order/finish-order/:id
+    async finishOrder(req, res) {
+        const id = req.params.id
+        try {
+            const id = req.params.id
+            try {
+                //Get order by id
+                const order = await Order.findOne({ _id: id })
+
+                //Check if order is not processing
+                if (order.status !== 'Đã giao hàng') {
+                    return res.status(400).json({
+                        message: 'Order is not confirm',
+                    })
+                }
+
+                //Change order status when confirm order
+                order.status = 'Đã hoàn thành'
+                //Save order in db
+                await order.save()
+
+                return res.status(200).json({
+                    message: 'Finished order success',
+                })
+            } catch (error) {
+                return res.status(400).json({
+                    message: 'An error occured! ' + error,
+                })
+            }
         } catch (error) {
             return res.status(400).json({
                 message: 'An error occured! ' + error,

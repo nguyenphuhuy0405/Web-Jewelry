@@ -17,6 +17,7 @@ const ProductSchema = new Schema(
         slug: {
             type: String,
             slug: 'title',
+            required: true,
             unique: true,
         },
         description: {
@@ -29,45 +30,46 @@ const ProductSchema = new Schema(
         images: {
             type: Array,
             default: [],
+            required: true,
         },
         categoryId: {
             type: Number,
             required: true,
             ref: 'Category',
         },
-        brandId: {
-            type: Number,
-            ref: 'Brand',
-        },
-        variations: {
-            type: [
-                {
-                    color: String,
-                    size: String,
-                    material: String,
-                    stock: Number,
-                },
-            ],
-            required: true,
-        },
-        attributes: {
-            type: [
-                {
-                    name: {
-                        type: String,
-                        required: true,
-                    },
-                    value: {
-                        type: String,
-                        required: true,
-                    },
-                    units: {
-                        type: String,
-                    },
-                },
-            ],
-            default: [],
-        },
+        // brandId: {
+        //     type: Number,
+        //     ref: 'Brand',
+        // },
+        // variations: {
+        //     type: [
+        //         {
+        //             color: String,
+        //             size: String,
+        //             material: String,
+        //             stock: Number,
+        //         },
+        //     ],
+        //     required: true,
+        // },
+        // attributes: {
+        //     type: [
+        //         {
+        //             name: {
+        //                 type: String,
+        //                 required: true,
+        //             },
+        //             value: {
+        //                 type: String,
+        //                 required: true,
+        //             },
+        //             units: {
+        //                 type: String,
+        //             },
+        //         },
+        //     ],
+        //     default: [],
+        // },
         totalRatings: {
             type: Number,
         },

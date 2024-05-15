@@ -12,6 +12,7 @@ class CartController {
                 })
             //Get cart by user id
             const cart = await Cart.findOne({ userId }).populate('products.productId')
+
             //If cart not exist return error message
             if (!cart)
                 return res.status(404).json({

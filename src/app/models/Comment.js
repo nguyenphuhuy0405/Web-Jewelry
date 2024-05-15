@@ -16,6 +16,7 @@ const CommentSchema = new Schema(
         userId: {
             type: Number,
             ref: 'User',
+            required: true,
         },
         content: {
             type: String,

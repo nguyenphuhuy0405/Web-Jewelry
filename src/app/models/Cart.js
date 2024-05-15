@@ -10,6 +10,7 @@ const CartSchema = new Schema(
         userId: {
             type: Number,
             ref: 'User',
+            required: true,
         },
         active: {
             type: Boolean,
@@ -25,8 +26,13 @@ const CartSchema = new Schema(
                     productId: {
                         type: Number,
                         ref: 'Product',
+                        required: true,
                     },
-                    quantity: Number,
+                    quantity: {
+                        type: Number,
+                        required: true,
+                        default: 1,
+                    },
                 },
             ],
         },
