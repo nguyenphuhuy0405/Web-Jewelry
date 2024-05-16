@@ -239,6 +239,7 @@ class OrderController {
                 address,
                 phoneNumber,
                 notes,
+                totalPrice: 0,
             })
             //Get order populate cartId
             const newOrder = await Order.findOne({

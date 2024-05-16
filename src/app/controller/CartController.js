@@ -125,10 +125,10 @@ class CartController {
         }
     }
 
-    //[DELETE] /api/cart/:productId
+    //[DELETE] /api/cart/:id
     async removeToCart(req, res) {
         const userId = req.user._id
-        const { productId } = req.body
+        const productId = req.params.id
         try {
             //Find cart by userId and push product (if not exist create new cart)
             await Cart.findOneAndUpdate(
