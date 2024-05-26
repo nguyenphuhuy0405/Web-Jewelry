@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const xlsx = require('xlsx')
 
 const Product = require('../models/Product')
 const User = require('../models/User')
@@ -142,8 +143,27 @@ class ProductController {
         }
     }
 
+    // [POST] /api/product/import
+    async import(req, res) {
+        try {
+            let path = req.file.path
+            var workbook = xlsx.readFile(path)
+            var sheet_name_list = workbook.SheetNames
+            let jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]])
+            console.log(jsonData)
+
+            return res.status(200).json({
+                message: 'Create products success',
+            })
+        } catch (error) {
+            return res.status(400).json({
+                message: 'An error occured! ' + error,
+            })
+        }
+    }
+
     // [PUT] /api/product/:id
-    async update(req, res, next) {
+    async update(req, res) {
         const { title, description, price, categoryId, brandId } = req.body
         let images = req.files
 
@@ -181,7 +201,7 @@ class ProductController {
             }
 
             // Update product by id
-            const newProduct = await Product.updateOne(
+            await Product.updateOne(
                 {
                     _id: req.params.id,
                 },
@@ -195,8 +215,7 @@ class ProductController {
                 },
             )
 
-            //Save product
-            await newProduct.save()
+            const newProduct = await Product.findOne({ _id: req.params.id }).lean()
 
             return res.status(200).json({
                 message: 'Update product success',

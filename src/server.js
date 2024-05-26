@@ -6,6 +6,7 @@ const morgan = require('morgan')
 const connectDB = require('./config/connectDB')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const compression = require('compression')
 require('dotenv').config()
 const cors = require('cors')
 
@@ -17,7 +18,11 @@ const corsOptions = {
     optionSuccessStatus: 200,
 }
 
+//Set pulic dir
 const publicDir = path.join(__dirname, '/public')
+
+//Compress responses
+app.use(compression())
 
 //Static file
 app.use(express.static(publicDir))

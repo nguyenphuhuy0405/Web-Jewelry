@@ -51,7 +51,8 @@ class OrderController {
     //[GET] /api/order/
     async list(req, res) {
         try {
-            const orders = await Order.find({}).sort({ createdAt: -1 }).populate('products.productId')
+            const limit = req.query.limit
+            const orders = await Order.find({}).sort({ createdAt: -1 }).populate('products.productId').limit(limit)
 
             return res.status(200).json({
                 message: 'Get list of orders success',

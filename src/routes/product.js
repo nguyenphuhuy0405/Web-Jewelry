@@ -11,6 +11,7 @@ router.delete('/comment', [VerifyToken], productController.deleteComment)
 
 router.put('/:id', [VerifyToken, VerifyUserIsAdmin], upload.array('images', 10), productController.update)
 router.delete('/:id', [VerifyToken, VerifyUserIsAdmin], productController.delete)
+router.post('/import', [VerifyToken, VerifyUserIsAdmin], upload.single('file'), productController.import)
 router.post('/', [VerifyToken, VerifyUserIsAdmin], upload.array('images', 10), productController.create)
 router.get('/:slug', productController.info)
 router.get('/', productController.list)
