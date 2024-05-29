@@ -391,6 +391,13 @@ class OrderController {
                 })
             }
 
+            //Check if order is not processing
+            if (order.payment === 'Thanh toán trước') {
+                return res.status(400).json({
+                    message: 'Order is paid',
+                })
+            }
+
             if (userRole != 'admin' && userId != order.userId) {
                 return res.status(400).json({
                     message: 'Order is not belong to user',
